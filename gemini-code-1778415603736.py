@@ -12,24 +12,24 @@ except ImportError:
     st.stop()
 
 # ==========================================
-# 1. STRICT TAXONOMY (4x4x8)
+# 1. TIGER ANALYTICS ENTERPRISE TAXONOMY
 # ==========================================
 INDUSTRIES = {
-    "Retail": ["Fashion & Apparel", "Consumer Electronics", "Grocery", "E-commerce"],
-    "CPG": ["Food & Beverage", "Beauty & Cosmetics", "Household Cleaning", "Pet Care"],
-    "Healthcare": ["Pharmaceuticals", "Medical Devices", "Hospitals", "Digital Health"],
-    "SaaS": ["AI Platforms", "Cybersecurity", "FinTech", "Cloud Infrastructure"]
+    "Retail & Apparel (e.g., Nike, Gap)": ["Athleisure & Footwear", "Fast Fashion", "Luxury Apparel", "Sporting Goods"],
+    "CPG & FMCG (e.g., PepsiCo)": ["Food & Beverage", "Snacks & Confectionery", "Sports & Energy Drinks", "Personal Care"],
+    "Direct-to-Consumer (D2C)": ["Subscription Boxes", "Digital-Native Brands", "Health & Supplements", "Home & Furniture"],
+    "Retail Operations & Tech": ["Omnichannel Fulfillment", "In-Store Experience", "E-commerce Platforms", "Supply Chain Tech"]
 }
 
 PERSONAS = [
-    "CEO (Strategy)", 
-    "Chief Operating Officer (Ops)", 
-    "VP of Strategy (Strategy)", 
-    "Supply Chain Director (Ops)", 
+    "Creative Designer (Ops)", 
+    "Campaign Analyst (Ops)", 
+    "Merchandising Manager (Ops)", 
+    "Data Scientist (Ops)",
+    "Digital Product Owner (Ops)",
     "Chief Marketing Officer (Strategy)", 
-    "Product Manager (Ops)", 
-    "Financial Controller (Ops)", 
-    "Data Scientist (Strategy/Ops)"
+    "VP of Supply Chain & Logistics (Strategy)", 
+    "Chief Revenue Officer (Strategy)"
 ]
 
 # ==========================================
@@ -52,13 +52,13 @@ class OmniverseIntelligence(BaseModel):
 # 3. THE LOGIC ENGINES
 # ==========================================
 def execute_social_listening(sub_industry: str, client: Groq):
-    """Crawls for raw viral semantic data and exact virality percentages."""
+    """Crawls for raw viral semantic data. This identifies the OVERARCHING macro trend."""
     sys_prompt = """
     You are a predictive text-mining crawler. Return strictly JSON:
-    - 'hero_insight': 1-sentence elite executive revelation about market demand.
+    - 'hero_insight': 1-sentence macro trend revelation about consumer demand.
     - 'viral_velocity_score': integer (0-100).
     - 'demand_trajectory': string (e.g., 'Hyper-Growth', 'Cooling').
-    - 'trending_keywords': dictionary of 6 exactly trending phrases and their virality percentage (integer 1-100). Example: {"supply chain automation": 92}
+    - 'trending_keywords': dictionary of 6 exactly trending phrases and their virality percentage (integer 1-100). Example: {"sustainable packaging": 92}
     """
     try:
         resp = client.chat.completions.create(
@@ -68,31 +68,40 @@ def execute_social_listening(sub_industry: str, client: Groq):
         return json.loads(resp.choices[0].message.content)
     except:
         return {
-            "hero_insight": "Market accelerating towards automated, high-yield efficiencies.", 
-            "viral_velocity_score": 85, "demand_trajectory": "Accelerating",
-            "trending_keywords": {"automation": 95, "scale": 88, "AI": 100, "margins": 75, "integration": 80, "SaaS": 90}
+            "hero_insight": "Consumers are shifting rapidly towards hyper-personalized, eco-conscious consumption.", 
+            "viral_velocity_score": 88, "demand_trajectory": "Accelerating",
+            "trending_keywords": {"eco-packaging": 95, "personalization AI": 88, "limited drops": 100, "clean ingredients": 75, "social commerce": 80, "loyalty apps": 90}
         }
 
 def execute_omniverse_synthesis(ind, sub, per, social_data, client):
-    """Synthesizes strategy heavily indexed on the selected Persona."""
+    """Synthesizes strategy heavily indexed on the selected Persona. The 'So What' engine."""
     
-    # Force the LLM to change output based on Ops vs Strategy
-    persona_directive = ""
-    if "Ops" in per:
-        persona_directive = "CRITICAL: Focus entirely on Supply Chain, Margins, Cost-Reduction, Throughput, and Operational Risk. Do not give marketing advice."
-    else:
-        persona_directive = "CRITICAL: Focus entirely on Market Share, CAC, Revenue Growth, Positioning, and Product Strategy. Do not give warehouse advice."
+    persona_directives = {
+        "Creative Designer (Ops)": "Focus ONLY on visual assets, color palettes, UX/UI, mood boards, ad creative, and translating the trend data into physical or digital design language. Do NOT talk about media buying or supply chain.",
+        "Campaign Analyst (Ops)": "Focus ONLY on media mix modeling, ROAS, CPA targets, A/B testing ad copy, audience segmentation, and attribution tracking. Provide mathematical/analytical action points. Do NOT talk about product design.",
+        "Merchandising Manager (Ops)": "Focus ONLY on SKU rationalization, shelf placement, stock-to-sales ratios, pricing tiers, and cross-selling strategies. How does the trend affect inventory placement?",
+        "Data Scientist (Ops)": "Focus ONLY on building predictive models, data pipelines, NLP sentiment tracking, clustering algorithms, and model deployment strategies based on the trend.",
+        "Digital Product Owner (Ops)": "Focus ONLY on app features, checkout conversion funnels, sprint planning, feature backlogs, and e-commerce UI/UX functionality.",
+        "Chief Marketing Officer (Strategy)": "Focus ONLY on overarching brand positioning, total market share capture, budget allocation across channels, and macro brand narrative.",
+        "VP of Supply Chain & Logistics (Strategy)": "Focus ONLY on supplier diversification, freight costs, warehouse automation, fulfillment speed, and inventory turnaround times.",
+        "Chief Revenue Officer (Strategy)": "Focus ONLY on top-line revenue, channel partnerships, B2B wholesale expansion, sales velocity, and overall margin growth."
+    }
+    
+    directive = persona_directives.get(per, "Provide actionable insights relevant to the persona.")
 
     sys_prompt = f"""
-    You are an elite MBB Strategy Partner advising a {per} in the {sub} ({ind}) sector.
-    LIVE VIRAL DATA: {json.dumps(social_data)}
+    You are an elite Strategy Partner advising a {per} at a major enterprise (e.g., Nike, PepsiCo) in the {sub} ({ind}) sector.
+    
+    LIVE VIRAL MACRO-TREND DATA: {json.dumps(social_data)}
 
-    {persona_directive}
+    CRITICAL DIRECTIVE FOR THIS PERSONA: 
+    {directive}
 
     MANDATES:
-    1. Governing Thought: Board-level answer integrating the Live Viral Data. Speak directly to the {per}'s daily KPIs.
-    2. MECE Pillars: 3 strategic pillars. EXACT keys: 'title' and 'description'.
-    3. Action Titles: Every response must drive execution for this specific persona.
+    1. Governing Thought: Board-level answer integrating the Live Viral Data, specifically tailored to the {per}'s daily KPIs.
+    2. MECE Pillars: 3 strategic pillars. EXACT keys: 'title' and 'description'. The description MUST explain the "So What?" and exact "Action Points" for this specific persona.
+    3. Action Titles: Every response must drive execution for the {per}.
+    4. KPI Impact Matrix: You MUST provide a dictionary of 3 core KPIs and how this strategy impacts them. Example: {{"CPA": "Reduces by 15% due to better targeting"}}.
     Return strictly JSON matching the OmniverseIntelligence schema.
     """
     try:
@@ -108,21 +117,20 @@ def execute_omniverse_synthesis(ind, sub, per, social_data, client):
 # ==========================================
 # 4. NATIVE, CLEAN UI DASHBOARD
 # ==========================================
-st.set_page_config(page_title="Executive Intelligence", layout="wide")
+st.set_page_config(page_title="Enterprise Intelligence", layout="wide")
 
-# Minimalist CSS just to clean up Streamlit's default padding
 st.markdown("""
     <style>
         .block-container { padding-top: 2rem; padding-bottom: 2rem; }
-        h1 { font-weight: 800; }
-        h2, h3 { font-weight: 700; }
+        h1 { font-weight: 800; color: #0f172a;}
+        h2, h3 { font-weight: 700; color: #1e293b;}
     </style>
 """, unsafe_allow_html=True)
 
 # --- SIDEBAR CONTROLS ---
 st.sidebar.title("Strategic Parameters")
-sel_ind = st.sidebar.selectbox("Industry", list(INDUSTRIES.keys()))
-sel_sub = st.sidebar.selectbox("Sub-Industry", INDUSTRIES[sel_ind])
+sel_ind = st.sidebar.selectbox("Enterprise Industry", list(INDUSTRIES.keys()))
+sel_sub = st.sidebar.selectbox("Sub-Industry Segment", INDUSTRIES[sel_ind])
 sel_per = st.sidebar.selectbox("Executive Persona", PERSONAS)
 
 st.sidebar.divider()
@@ -132,8 +140,8 @@ if "GROQ_API_KEY" not in st.secrets:
     st.stop()
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
-if st.sidebar.button("Execute Strategic Synthesis", type="primary", use_container_width=True):
-    with st.spinner(f"Aggregating Viral Data & Tailoring for {sel_per}..."):
+if st.sidebar.button(f"Generate Strategy for {sel_per.split(' ')[0]}", type="primary", use_container_width=True):
+    with st.spinner(f"Aggregating Viral Data & Tailoring for {sel_per.split(' ')[0]}..."):
         social_data = execute_social_listening(sel_sub, client)
         intel = execute_omniverse_synthesis(sel_ind, sel_sub, sel_per, social_data, client)
         
@@ -147,9 +155,9 @@ if "intel" in st.session_state:
     sd = st.session_state.social_data
 
     # 1. HERO HEADER
-    st.markdown(f"##### EXECUTIVE BRIEFING FOR: **{sel_per.upper()}**")
+    st.markdown(f"##### ENTERPRISE BRIEFING FOR: **{sel_per.upper()}**")
     st.header(doc.get('governing_thought', 'Strategic Overview'))
-    st.info(f"**Live Market Signal:** {sd.get('hero_insight', '')}")
+    st.info(f"**Live Macro Trend Signal:** {sd.get('hero_insight', '')}")
     
     st.divider()
 
@@ -159,13 +167,14 @@ if "intel" in st.session_state:
     with col_keywords:
         st.subheader("Trending Market Signals")
         st.caption("Real-time virality percentages based on social listening.")
-        # Renders beautiful, native progress bars for each keyword
         keywords = sd.get("trending_keywords", {})
-        for kw, score in keywords.items():
-            # Clean up the output ensuring score is an integer between 0 and 100
-            safe_score = min(max(int(score), 0), 100)
-            st.markdown(f"**{kw.title()}**")
-            st.progress(safe_score / 100.0, text=f"{safe_score}% Viral Saturation")
+        if keywords:
+            for kw, score in keywords.items():
+                safe_score = min(max(int(score), 0), 100)
+                st.markdown(f"**{kw.title()}**")
+                st.progress(safe_score / 100.0, text=f"{safe_score}% Viral Saturation")
+        else:
+            st.warning("No keyword data currently available.")
 
     with col_metrics:
         st.subheader("Velocity & Risk")
@@ -173,14 +182,14 @@ if "intel" in st.session_state:
         c1.metric("Viral Velocity Index", f"{sd.get('viral_velocity_score', 0)} / 100")
         c2.metric("Demand Trajectory", sd.get("demand_trajectory", "Active"))
         
-        st.error(f"**Linchpin Risk Variable:**\n{doc.get('linchpin_risk', 'N/A')}")
+        st.error(f"**Persona-Specific Linchpin Risk:**\n{doc.get('linchpin_risk', 'N/A')}")
         
     st.divider()
 
-    # 3. MECE PILLARS (Tailored to Persona)
-    st.subheader(f"Strategic Pillars for {sel_per.split(' ')[0]}")
+    # 3. MECE PILLARS
+    st.subheader(f"Actionable Strategy for {sel_per.split(' ')[0]}")
     pillars = doc.get('strategic_pillars', [])
-    if pillars:
+    if pillars and len(pillars) > 0:
         cols = st.columns(len(pillars))
         for i, pillar in enumerate(pillars):
             with cols[i]:
@@ -189,41 +198,53 @@ if "intel" in st.session_state:
                 with st.container(border=True):
                     st.markdown(f"#### 0{i+1}")
                     st.markdown(f"**{title}**")
-                    st.markdown(f"<span style='color:gray'>{desc}</span>", unsafe_allow_html=True)
+                    st.markdown(f"<span style='color:#475569'>{desc}</span>", unsafe_allow_html=True)
+    else:
+        st.warning("No strategic pillars generated.")
 
     st.divider()
 
-    # 4. ARBITRAGE MATRIX (Native Streamlit DataFrame styling)
-    st.subheader("Predictive Arbitrage Matrix")
+    # 4. ARBITRAGE MATRIX
+    st.subheader(f"Initiative Prioritization & Arbitrage")
     signals = doc.get('signals', [])
     if signals:
-        sig_df = pd.DataFrame(signals)
-        sig_df['Arbitrage Index'] = (sig_df['virality_score'] * sig_df['yield_velocity']).round(2)
-        sig_df = sig_df.sort_values(by='Arbitrage Index', ascending=False)
-        
-        # Clean up column names for presentation
-        sig_df = sig_df.rename(columns={
-            "feature_name": "Feature / Initiative",
-            "mbb_action_title": "Strategic Action Directive",
-            "virality_score": "Virality Score",
-            "yield_velocity": "Yield Velocity"
-        })
-        
-        # Display using Streamlit's native, highly readable dataframe component
-        st.dataframe(
-            sig_df,
-            use_container_width=True,
-            hide_index=True,
-            column_config={
-                "Virality Score": st.column_config.ProgressColumn("Virality Score", min_value=0, max_value=100, format="%f"),
-                "Yield Velocity": st.column_config.NumberColumn("Yield Velocity", format="%.2fx")
-            }
-        )
+        try:
+            sig_df = pd.DataFrame(signals)
+            sig_df['Arbitrage Index'] = (sig_df['virality_score'] * sig_df['yield_velocity']).round(2)
+            sig_df = sig_df.sort_values(by='Arbitrage Index', ascending=False)
+            
+            sig_df = sig_df.rename(columns={
+                "feature_name": "Initiative",
+                "mbb_action_title": "Execution Directive",
+                "virality_score": "Virality Score",
+                "yield_velocity": "Yield Velocity"
+            })
+            
+            st.dataframe(
+                sig_df,
+                use_container_width=True,
+                hide_index=True,
+                column_config={
+                    "Virality Score": st.column_config.ProgressColumn("Virality Score", min_value=0, max_value=100, format="%f"),
+                    "Yield Velocity": st.column_config.NumberColumn("Yield Velocity", format="%.2fx")
+                }
+            )
+        except Exception as e:
+            st.warning("Could not render the Arbitrage Matrix properly based on the AI output format.")
+    else:
+        st.info("No signal initiatives generated.")
 
-    # 5. KPI ATTRIBUTION
-    st.subheader(f"KPI Attribution for {sel_per.split(' ')[0]}")
-    kpi_cols = st.columns(len(doc.get('kpi_impact_matrix', {})))
-    for i, (k, v) in enumerate(doc.get('kpi_impact_matrix', {}).items()):
-        with kpi_cols[i % len(kpi_cols)]:
-            st.markdown(f"**{k}**")
-            st.caption(v)
+    # 5. KPI ATTRIBUTION (Bug Fixed Here)
+    st.subheader("Core KPI Impact")
+    kpi_matrix = doc.get('kpi_impact_matrix', {})
+    
+    # Safety Check: Only create columns if the KPI dictionary actually contains items
+    if kpi_matrix and len(kpi_matrix) > 0:
+        kpi_cols = st.columns(len(kpi_matrix))
+        for i, (k, v) in enumerate(kpi_matrix.items()):
+            with kpi_cols[i % len(kpi_cols)]:
+                with st.container(border=True):
+                    st.markdown(f"**{k}**")
+                    st.caption(v)
+    else:
+        st.info("No KPI attribution metrics generated for this scenario.")
