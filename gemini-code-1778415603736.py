@@ -67,6 +67,7 @@ def execute_social_listening(sub_industry: str, client: Groq):
         )
         return json.loads(resp.choices[0].message.content)
     except:
+        # Fallback if API gets rate-limited
         return {
             "hero_insight": "Consumers are shifting rapidly towards hyper-personalized, eco-conscious consumption.", 
             "viral_velocity_score": 88, "demand_trajectory": "Accelerating",
@@ -74,8 +75,9 @@ def execute_social_listening(sub_industry: str, client: Groq):
         }
 
 def execute_omniverse_synthesis(ind, sub, per, social_data, client):
-    """Synthesizes strategy heavily indexed on the selected Persona. The 'So What' engine."""
+    """Synthesizes strategy heavily indexed on the selected Persona."""
     
+    # STRICT PERSONA ROUTING: Forces unique action points
     persona_directives = {
         "Creative Designer (Ops)": "Focus ONLY on visual assets, color palettes, UX/UI, mood boards, ad creative, and translating the trend data into physical or digital design language. Do NOT talk about media buying or supply chain.",
         "Campaign Analyst (Ops)": "Focus ONLY on media mix modeling, ROAS, CPA targets, A/B testing ad copy, audience segmentation, and attribution tracking. Provide mathematical/analytical action points. Do NOT talk about product design.",
@@ -89,6 +91,7 @@ def execute_omniverse_synthesis(ind, sub, per, social_data, client):
     
     directive = persona_directives.get(per, "Provide actionable insights relevant to the persona.")
 
+    # The prompt explicitly includes the JSON format to prevent formatting crashes
     sys_prompt = f"""
     You are an elite Strategy Partner advising a {per} at a major enterprise (e.g., Nike, PepsiCo) in the {sub} ({ind}) sector.
     
@@ -98,11 +101,25 @@ def execute_omniverse_synthesis(ind, sub, per, social_data, client):
     {directive}
 
     MANDATES:
-    1. Governing Thought: Board-level answer integrating the Live Viral Data, specifically tailored to the {per}'s daily KPIs.
-    2. MECE Pillars: 3 strategic pillars. EXACT keys: 'title' and 'description'. The description MUST explain the "So What?" and exact "Action Points" for this specific persona.
-    3. Action Titles: Every response must drive execution for the {per}.
-    4. KPI Impact Matrix: You MUST provide a dictionary of 3 core KPIs and how this strategy impacts them. Example: {{"CPA": "Reduces by 15% due to better targeting"}}.
-    Return strictly JSON matching the OmniverseIntelligence schema.
+    1. Governing Thought: Board-level answer integrating the Live Viral Data, tailored to the {per}.
+    2. MECE Pillars: 3 strategic pillars mapping exact "Action Points" for this specific persona.
+    3. Action Titles: Every response must drive execution.
+    4. KPI Impact Matrix: 3 core KPIs and how this strategy impacts them.
+
+    OUTPUT FORMAT (STRICT JSON EXACTLY AS SHOWN BELOW):
+    {{
+        "governing_thought": "string",
+        "strategic_pillars": [
+            {{"title": "string", "description": "string"}},
+            {{"title": "string", "description": "string"}},
+            {{"title": "string", "description": "string"}}
+        ],
+        "signals": [
+            {{"feature_name": "string", "virality_score": 90.5, "yield_velocity": 2.4, "mbb_action_title": "string"}}
+        ],
+        "kpi_impact_matrix": {{"KPI 1": "Impact", "KPI 2": "Impact", "KPI 3": "Impact"}},
+        "linchpin_risk": "string"
+    }}
     """
     try:
         resp = client.chat.completions.create(
@@ -205,7 +222,7 @@ if "intel" in st.session_state:
     st.divider()
 
     # 4. ARBITRAGE MATRIX
-    st.subheader(f"Initiative Prioritization & Arbitrage")
+    st.subheader("Initiative Prioritization & Arbitrage")
     signals = doc.get('signals', [])
     if signals:
         try:
@@ -234,11 +251,10 @@ if "intel" in st.session_state:
     else:
         st.info("No signal initiatives generated.")
 
-    # 5. KPI ATTRIBUTION (Bug Fixed Here)
+    # 5. KPI ATTRIBUTION
     st.subheader("Core KPI Impact")
     kpi_matrix = doc.get('kpi_impact_matrix', {})
     
-    # Safety Check: Only create columns if the KPI dictionary actually contains items
     if kpi_matrix and len(kpi_matrix) > 0:
         kpi_cols = st.columns(len(kpi_matrix))
         for i, (k, v) in enumerate(kpi_matrix.items()):
