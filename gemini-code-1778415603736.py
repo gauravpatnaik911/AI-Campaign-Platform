@@ -1,9 +1,22 @@
 import streamlit as st
-from groq import Groq
 import json
 from pydantic import BaseModel
-import matplotlib.pyplot as plt
-from wordcloud import WordCloud
+
+# --- BULLETPROOF IMPORTS ---
+# If Groq fails, the app stops safely.
+try:
+    from groq import Groq
+except ImportError:
+    st.error("CRITICAL: 'groq' library not found. Please add it to requirements.txt.")
+    st.stop()
+
+# If visual libraries fail, the app stays alive but disables the graph.
+try:
+    import matplotlib.pyplot as plt
+    from wordcloud import WordCloud
+    VISUALS_ENABLED = True
+except ImportError:
+    VISUALS_ENABLED = False
 
 # ==========================================
 # 1. APPLE-STYLE CSS INJECTION
@@ -11,64 +24,28 @@ from wordcloud import WordCloud
 def inject_apple_css():
     st.markdown("""
     <style>
-        /* Global Typography & Background */
         html, body, [class*="css"]  {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #fbfbfd;
             color: #1d1d1f;
         }
-        
-        /* Smooth Header Typography */
-        h1 {
-            font-weight: 700 !important;
-            letter-spacing: -0.015em !important;
-            font-size: 2.5rem !important;
-            color: #1d1d1f !important;
-        }
-        h2, h3 {
-            font-weight: 600 !important;
-            letter-spacing: -0.012em !important;
-            color: #1d1d1f !important;
-        }
-
-        /* iOS/macOS Widget Style Metrics */
+        h1 { font-weight: 700 !important; letter-spacing: -0.015em !important; font-size: 2.5rem !important; color: #1d1d1f !important; }
+        h2, h3 { font-weight: 600 !important; letter-spacing: -0.012em !important; color: #1d1d1f !important; }
         [data-testid="stMetric"] {
-            background-color: #ffffff;
-            border-radius: 18px;
-            padding: 20px 24px;
+            background-color: #ffffff; border-radius: 18px; padding: 20px 24px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.08);
             transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         [data-testid="stMetric"]:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.06);
+            transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.06);
         }
-        
-        /* Primary Button Styling (Apple Blue) */
         div.stButton > button {
-            background-color: #0071e3 !important;
-            color: white !important;
-            border-radius: 980px !important;
-            padding: 12px 24px !important;
-            font-weight: 600 !important;
-            border: none !important;
-            transition: all 0.2s ease !important;
+            background-color: #0071e3 !important; color: white !important; border-radius: 980px !important;
+            padding: 12px 24px !important; font-weight: 600 !important; border: none !important; transition: all 0.2s ease !important;
         }
-        div.stButton > button:hover {
-            background-color: #0077ED !important;
-            transform: scale(1.02);
-        }
-
-        /* Clean Expander Styling */
-        .streamlit-expanderHeader {
-            font-weight: 600 !important;
-            border-radius: 12px !important;
-        }
-        
-        /* Hide Default Streamlit Chrome */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
+        div.stButton > button:hover { background-color: #0077ED !important; transform: scale(1.02); }
+        .streamlit-expanderHeader { font-weight: 600 !important; border-radius: 12px !important; }
+        #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
@@ -100,9 +77,6 @@ UNIVERSAL_LAYERS = {
     "Consumer Insights Lead": "Analytical"
 }
 
-# ==========================================
-# 3. GOVERNANCE ARCHITECTURE (10 Artifacts)
-# ==========================================
 class EnterpriseContextLayer(BaseModel):
     data_inventory: str
     data_directory: str
@@ -131,10 +105,9 @@ def build_enterprise_context(industry: str, sub_ind: str, domain: str, persona: 
     )
 
 # ==========================================
-# 4. SOCIAL LISTENING & TEXT MINING ENGINE
+# 3. SOCIAL LISTENING ENGINE
 # ==========================================
 def execute_social_listening_crawl(sub_industry: str, domain: str, client: Groq):
-    """Upgraded JSON schema for the Apple-style UI."""
     sys_prompt = """
     You are a predictive text-mining crawler analyzing real-time social data.
     Return strictly JSON with the following keys:
@@ -164,22 +137,23 @@ def execute_social_listening_crawl(sub_industry: str, domain: str, client: Groq)
         }
 
 def generate_wordcloud(word_freq: dict):
-    """Sleek, dark-mode WordCloud for premium feel."""
+    if not VISUALS_ENABLED:
+        return None
     wc = WordCloud(width=800, height=400, background_color='#1d1d1f', colormap='Blues', border_radius=15).generate_from_frequencies(word_freq)
-    fig, ax = plt.subplots(figsize=(8, 4), facecolor='#fbfbfd') # match app bg
+    fig, ax = plt.subplots(figsize=(8, 4), facecolor='#fbfbfd')
     ax.imshow(wc, interpolation='bilinear')
     ax.axis('off')
     plt.tight_layout(pad=0)
     return fig
 
 # ==========================================
-# 5. STREAMLIT DASHBOARD
+# 4. STREAMLIT DASHBOARD
 # ==========================================
 st.set_page_config(page_title="Semantic AI", layout="wide", page_icon="")
-inject_apple_css() # Apply the UI upgrade
+inject_apple_css()
 
 if "GROQ_API_KEY" not in st.secrets:
-    st.error("Missing GROQ_API_KEY in Secrets.")
+    st.error("Missing GROQ_API_KEY in Streamlit Secrets. Please configure it in your app settings.")
     st.stop()
 
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
@@ -187,7 +161,6 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 if "intel" not in st.session_state: st.session_state.intel = None
 if "chat_history" not in st.session_state: st.session_state.chat_history = []
 
-# --- Sidebar UI ---
 st.sidebar.title("Intelligence Engine")
 industry = st.sidebar.selectbox("Industry", list(TAXONOMY.keys()))
 sub_ind = st.sidebar.selectbox("Sub-Industry", TAXONOMY[industry]["sub_industries"])
@@ -221,11 +194,9 @@ if st.sidebar.button("Execute Deep Mining Scan"):
         except Exception as e:
             st.error(f"Engine Error: {e}")
 
-# --- MAIN DASHBOARD RENDER ---
 if st.session_state.intel:
     sd = st.session_state.social_data
     
-    # Apple-Style Hero Insight Headline
     st.markdown(f"""
     <div style='text-align: center; padding: 40px 0;'>
         <h1 style='font-size: 3rem; background: -webkit-linear-gradient(#1d1d1f, #555); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
@@ -235,7 +206,6 @@ if st.session_state.intel:
     </div>
     """, unsafe_allow_html=True)
     
-    # Sleek Metrics Row (These will have hover states from CSS)
     col1, col2, col3, col4 = st.columns(4)
     v_score = sd.get("viral_velocity_score", 0)
     col1.metric("Viral Velocity", f"{v_score}/100", "+ High" if v_score > 70 else "- Stable")
@@ -245,13 +215,16 @@ if st.session_state.intel:
     
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Word Cloud & Metadata Row
     chart_col, meta_col = st.columns([1.5, 1])
     
     with chart_col:
         st.markdown("### Semantic Network Density")
-        fig = generate_wordcloud(sd.get("trending_keywords", {"data": 100}))
-        st.pyplot(fig)
+        if VISUALS_ENABLED:
+            fig = generate_wordcloud(sd.get("trending_keywords", {"data": 100}))
+            st.pyplot(fig)
+        else:
+            st.warning("WordCloud disabled. Please add 'matplotlib' and 'wordcloud' to your requirements.txt file to view the Semantic Network Density chart.")
+            st.json(sd.get("trending_keywords", {}))
         
     with meta_col:
         st.markdown("### System Ontology")
@@ -261,6 +234,5 @@ if st.session_state.intel:
             st.markdown(f"**Semantic Layer:** {doc.semantic_layer}")
             st.markdown(f"**Model:** {doc.model_registry}")
 
-    # Strategic AI Briefing
     st.markdown("---")
     st.markdown(f"<div style='padding: 20px; background-color: #ffffff; border-radius: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.04);'> {st.session_state.intel} </div>", unsafe_allow_html=True)
