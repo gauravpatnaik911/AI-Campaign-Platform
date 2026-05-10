@@ -47,18 +47,18 @@ class OmniverseIntelligence(BaseModel):
     signals: List[StrategicSignal]
     kpi_impact_matrix: Dict[str, str]
     linchpin_risk: str
+    persona_deliverables: List[Dict[str, str]] # Dynamic based on Persona!
 
 # ==========================================
 # 3. THE LOGIC ENGINES
 # ==========================================
 def execute_social_listening(sub_industry: str, client: Groq):
-    """Crawls for raw viral semantic data. This identifies the OVERARCHING macro trend."""
     sys_prompt = """
     You are a predictive text-mining crawler. Return strictly JSON:
     - 'hero_insight': 1-sentence macro trend revelation about consumer demand.
     - 'viral_velocity_score': integer (0-100).
     - 'demand_trajectory': string (e.g., 'Hyper-Growth', 'Cooling').
-    - 'trending_keywords': dictionary of 6 exactly trending phrases and their virality percentage (integer 1-100). Example: {"sustainable packaging": 92}
+    - 'trending_keywords': dictionary of 6 trending phrases and their virality percentage (integer 1-100).
     """
     try:
         resp = client.chat.completions.create(
@@ -67,44 +67,34 @@ def execute_social_listening(sub_industry: str, client: Groq):
         )
         return json.loads(resp.choices[0].message.content)
     except:
-        # Fallback if API gets rate-limited
         return {
-            "hero_insight": "Consumers are shifting rapidly towards hyper-personalized, eco-conscious consumption.", 
+            "hero_insight": "Consumers are shifting rapidly towards hyper-personalized, eco-conscious aesthetics.", 
             "viral_velocity_score": 88, "demand_trajectory": "Accelerating",
-            "trending_keywords": {"eco-packaging": 95, "personalization AI": 88, "limited drops": 100, "clean ingredients": 75, "social commerce": 80, "loyalty apps": 90}
+            "trending_keywords": {"eco-aesthetics": 95, "bold minimalism": 88, "limited drops": 100, "neon accents": 75, "raw materials": 80, "nostalgia core": 90}
         }
 
 def execute_omniverse_synthesis(ind, sub, per, social_data, client):
-    """Synthesizes strategy heavily indexed on the selected Persona."""
-    
-    # STRICT PERSONA ROUTING: Forces unique action points
+    # ---------------------------------------------------------
+    # HYPER-PERSONALIZED DELIVERABLE ROUTING
+    # ---------------------------------------------------------
     persona_directives = {
-        "Creative Designer (Ops)": "Focus ONLY on visual assets, color palettes, UX/UI, mood boards, ad creative, and translating the trend data into physical or digital design language. Do NOT talk about media buying or supply chain.",
-        "Campaign Analyst (Ops)": "Focus ONLY on media mix modeling, ROAS, CPA targets, A/B testing ad copy, audience segmentation, and attribution tracking. Provide mathematical/analytical action points. Do NOT talk about product design.",
-        "Merchandising Manager (Ops)": "Focus ONLY on SKU rationalization, shelf placement, stock-to-sales ratios, pricing tiers, and cross-selling strategies. How does the trend affect inventory placement?",
-        "Data Scientist (Ops)": "Focus ONLY on building predictive models, data pipelines, NLP sentiment tracking, clustering algorithms, and model deployment strategies based on the trend.",
-        "Digital Product Owner (Ops)": "Focus ONLY on app features, checkout conversion funnels, sprint planning, feature backlogs, and e-commerce UI/UX functionality.",
-        "Chief Marketing Officer (Strategy)": "Focus ONLY on overarching brand positioning, total market share capture, budget allocation across channels, and macro brand narrative.",
-        "VP of Supply Chain & Logistics (Strategy)": "Focus ONLY on supplier diversification, freight costs, warehouse automation, fulfillment speed, and inventory turnaround times.",
-        "Chief Revenue Officer (Strategy)": "Focus ONLY on top-line revenue, channel partnerships, B2B wholesale expansion, sales velocity, and overall margin growth."
+        "Creative Designer (Ops)": "Focus ONLY on visual assets, colors, UX/UI, and mood boards. For 'persona_deliverables', provide 3 specific 'Visual Concept Moodboards'. Provide a 1-word 'image_keyword' for each.",
+        "Campaign Analyst (Ops)": "Focus ONLY on media mix modeling, ROAS, and attribution. For 'persona_deliverables', provide 3 specific 'A/B Test Hypotheses' with control/variant details.",
+        "Merchandising Manager (Ops)": "Focus ONLY on SKU rationalization and shelf placement. For 'persona_deliverables', provide 3 specific 'Shelf/SKU Interventions'.",
+        "Data Scientist (Ops)": "Focus ONLY on predictive models and data pipelines. For 'persona_deliverables', provide 3 specific 'Machine Learning Model Architectures'.",
+        "Digital Product Owner (Ops)": "Focus ONLY on app features and checkout funnels. For 'persona_deliverables', provide 3 specific 'Sprint Backlog Features'.",
+        "Chief Marketing Officer (Strategy)": "Focus ONLY on brand positioning and market share. For 'persona_deliverables', provide 3 specific 'Macro Brand Narratives'.",
+        "VP of Supply Chain & Logistics (Strategy)": "Focus ONLY on freight, automation, and speed. For 'persona_deliverables', provide 3 specific 'Logistics Cost-Reduction Initiatives'.",
+        "Chief Revenue Officer (Strategy)": "Focus ONLY on B2B expansion and margin growth. For 'persona_deliverables', provide 3 specific 'Revenue Stream Expansions'."
     }
     
-    directive = persona_directives.get(per, "Provide actionable insights relevant to the persona.")
+    directive = persona_directives.get(per, "Provide actionable insights.")
 
-    # The prompt explicitly includes the JSON format to prevent formatting crashes
     sys_prompt = f"""
-    You are an elite Strategy Partner advising a {per} at a major enterprise (e.g., Nike, PepsiCo) in the {sub} ({ind}) sector.
-    
+    You are an elite Strategy Partner advising a {per} at an enterprise like Nike or PepsiCo in the {sub} ({ind}) sector.
     LIVE VIRAL MACRO-TREND DATA: {json.dumps(social_data)}
 
-    CRITICAL DIRECTIVE FOR THIS PERSONA: 
-    {directive}
-
-    MANDATES:
-    1. Governing Thought: Board-level answer integrating the Live Viral Data, tailored to the {per}.
-    2. MECE Pillars: 3 strategic pillars mapping exact "Action Points" for this specific persona.
-    3. Action Titles: Every response must drive execution.
-    4. KPI Impact Matrix: 3 core KPIs and how this strategy impacts them.
+    CRITICAL DIRECTIVE: {directive}
 
     OUTPUT FORMAT (STRICT JSON EXACTLY AS SHOWN BELOW):
     {{
@@ -118,7 +108,10 @@ def execute_omniverse_synthesis(ind, sub, per, social_data, client):
             {{"feature_name": "string", "virality_score": 90.5, "yield_velocity": 2.4, "mbb_action_title": "string"}}
         ],
         "kpi_impact_matrix": {{"KPI 1": "Impact", "KPI 2": "Impact", "KPI 3": "Impact"}},
-        "linchpin_risk": "string"
+        "linchpin_risk": "string",
+        "persona_deliverables": [
+            {{"title": "string", "description": "string", "image_keyword": "string"}} 
+        ]
     }}
     """
     try:
@@ -216,12 +209,40 @@ if "intel" in st.session_state:
                     st.markdown(f"#### 0{i+1}")
                     st.markdown(f"**{title}**")
                     st.markdown(f"<span style='color:#475569'>{desc}</span>", unsafe_allow_html=True)
-    else:
-        st.warning("No strategic pillars generated.")
 
     st.divider()
 
-    # 4. ARBITRAGE MATRIX
+    # -------------------------------------------------------------
+    # 4. EXCLUSIVE PERSONA DELIVERABLES (NEW FEATURE)
+    # -------------------------------------------------------------
+    st.subheader(f"Exclusive Deliverables: {sel_per.split(' ')[0]}")
+    deliverables = doc.get('persona_deliverables', [])
+    
+    if deliverables and len(deliverables) > 0:
+        del_cols = st.columns(len(deliverables))
+        for i, item in enumerate(deliverables):
+            with del_cols[i]:
+                d_title = item.get('title', 'Deliverable')
+                d_desc = item.get('description', 'Details pending.')
+                
+                with st.container(border=True):
+                    # IF DESIGNER: Render actual visual imagery placeholders
+                    if "Designer" in sel_per:
+                        kw = item.get('image_keyword', 'design').replace(' ', ',')
+                        # Generates high-quality mockups based on the AI's keyword
+                        st.image(f"https://loremflickr.com/600/400/{kw},aesthetic?lock={i}", use_container_width=True)
+                        st.markdown(f"**Moodboard Concept: {d_title}**")
+                    else:
+                        # ALL OTHER PERSONAS: Render their specific text matrix
+                        st.markdown(f"**Tactical Asset: {d_title}**")
+                    
+                    st.markdown(f"<span style='color:#475569'>{d_desc}</span>", unsafe_allow_html=True)
+    else:
+        st.info(f"No specific tactical deliverables generated for {sel_per}.")
+
+    st.divider()
+
+    # 5. ARBITRAGE MATRIX
     st.subheader("Initiative Prioritization & Arbitrage")
     signals = doc.get('signals', [])
     if signals:
@@ -238,23 +259,18 @@ if "intel" in st.session_state:
             })
             
             st.dataframe(
-                sig_df,
-                use_container_width=True,
-                hide_index=True,
+                sig_df, use_container_width=True, hide_index=True,
                 column_config={
                     "Virality Score": st.column_config.ProgressColumn("Virality Score", min_value=0, max_value=100, format="%f"),
                     "Yield Velocity": st.column_config.NumberColumn("Yield Velocity", format="%.2fx")
                 }
             )
-        except Exception as e:
-            st.warning("Could not render the Arbitrage Matrix properly based on the AI output format.")
-    else:
-        st.info("No signal initiatives generated.")
-
-    # 5. KPI ATTRIBUTION
+        except Exception:
+            st.warning("Matrix rendering issue.")
+    
+    # 6. KPI ATTRIBUTION
     st.subheader("Core KPI Impact")
     kpi_matrix = doc.get('kpi_impact_matrix', {})
-    
     if kpi_matrix and len(kpi_matrix) > 0:
         kpi_cols = st.columns(len(kpi_matrix))
         for i, (k, v) in enumerate(kpi_matrix.items()):
@@ -262,5 +278,3 @@ if "intel" in st.session_state:
                 with st.container(border=True):
                     st.markdown(f"**{k}**")
                     st.caption(v)
-    else:
-        st.info("No KPI attribution metrics generated for this scenario.")
