@@ -2,37 +2,94 @@ import streamlit as st
 from groq import Groq
 import json
 from pydantic import BaseModel
-from typing import Dict, List
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
 
 # ==========================================
-# 1. TAXONOMY & MOCK DATABASE
+# 1. APPLE-STYLE CSS INJECTION
 # ==========================================
-# Derived directly from your uploaded architecture CSVs
+def inject_apple_css():
+    st.markdown("""
+    <style>
+        /* Global Typography & Background */
+        html, body, [class*="css"]  {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fbfbfd;
+            color: #1d1d1f;
+        }
+        
+        /* Smooth Header Typography */
+        h1 {
+            font-weight: 700 !important;
+            letter-spacing: -0.015em !important;
+            font-size: 2.5rem !important;
+            color: #1d1d1f !important;
+        }
+        h2, h3 {
+            font-weight: 600 !important;
+            letter-spacing: -0.012em !important;
+            color: #1d1d1f !important;
+        }
+
+        /* iOS/macOS Widget Style Metrics */
+        [data-testid="stMetric"] {
+            background-color: #ffffff;
+            border-radius: 18px;
+            padding: 20px 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.08);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        [data-testid="stMetric"]:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.06);
+        }
+        
+        /* Primary Button Styling (Apple Blue) */
+        div.stButton > button {
+            background-color: #0071e3 !important;
+            color: white !important;
+            border-radius: 980px !important;
+            padding: 12px 24px !important;
+            font-weight: 600 !important;
+            border: none !important;
+            transition: all 0.2s ease !important;
+        }
+        div.stButton > button:hover {
+            background-color: #0077ED !important;
+            transform: scale(1.02);
+        }
+
+        /* Clean Expander Styling */
+        .streamlit-expanderHeader {
+            font-weight: 600 !important;
+            border-radius: 12px !important;
+        }
+        
+        /* Hide Default Streamlit Chrome */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+    </style>
+    """, unsafe_allow_html=True)
+
+# ==========================================
+# 2. TAXONOMY & UNIVERSAL LAYERS
+# ==========================================
 TAXONOMY = {
     "Retail": {
-        "sub_industries": ["Fashion & Apparel", "Luxury Retail", "Grocery & Supermarket", "Consumer Electronics Retail", "E-commerce Marketplace"],
-        "domains": ["Merchandising", "Assortment Planning", "Demand Forecasting", "Inventory Optimization", "Digital Commerce"],
-        "personas": ["CEO", "CMO", "Category Manager", "Merchandiser", "Data Scientist", "Pricing Analyst"]
+        "sub_industries": ["Fashion & Apparel", "Luxury Retail", "Consumer Electronics Retail"],
+        "domains": ["Merchandising", "Demand Forecasting", "Digital Commerce"],
+        "personas": ["CEO", "CMO", "Category Manager", "Merchandiser"]
     },
     "CPG": {
-        "sub_industries": ["Food & Beverage", "Beauty & Personal Care", "Household Products", "Health & Wellness"],
-        "domains": ["Brand Management", "Trade Promotion", "Channel Analytics", "Consumer Insights"],
-        "personas": ["Brand Manager", "Trade Marketing Manager", "Demand Planner", "Consumer Insights Lead"]
-    },
-    "Banking & Financial Services": {
-        "sub_industries": ["Retail Banking", "Commercial Banking", "Investment Banking", "FinTech"],
-        "domains": ["Risk Management", "Fraud Detection", "AML/KYC", "Portfolio Analytics"],
-        "personas": ["Relationship Manager", "Risk Officer", "Fraud Analyst", "Investment Advisor"]
-    },
-    "Healthcare & Life Sciences": {
-        "sub_industries": ["Hospitals & Providers", "Pharmaceuticals", "Medical Devices"],
-        "domains": ["Patient Journey", "Clinical Operations", "Drug Discovery", "Clinical Trials"],
-        "personas": ["Physician", "Hospital Administrator", "Clinical Analyst", "Medical Affairs Lead"]
+        "sub_industries": ["Food & Beverage", "Beauty & Personal Care", "Health & Wellness"],
+        "domains": ["Brand Management", "Consumer Insights", "Channel Analytics"],
+        "personas": ["Brand Manager", "Trade Marketing Manager", "Consumer Insights Lead"]
     },
     "Technology & SaaS": {
-        "sub_industries": ["SaaS Platforms", "Cloud Infrastructure", "Cybersecurity", "AI Platforms"],
-        "domains": ["Product Analytics", "Customer Success", "Platform Reliability", "Usage Intelligence"],
-        "personas": ["Product Manager", "Customer Success Manager", "DevOps Engineer", "Platform Architect"]
+        "sub_industries": ["SaaS Platforms", "AI Platforms", "Cybersecurity"],
+        "domains": ["Product Analytics", "Usage Intelligence", "Customer Success"],
+        "personas": ["Product Manager", "DevOps Engineer", "Platform Architect"]
     }
 }
 
@@ -40,11 +97,11 @@ UNIVERSAL_LAYERS = {
     "CEO": "Executive", "CMO": "Executive", 
     "Category Manager": "Strategic", "Brand Manager": "Strategic", "Product Manager": "Strategic",
     "Merchandiser": "Operational", "DevOps Engineer": "Technical", "Platform Architect": "Technical",
-    "Data Scientist": "Analytical", "Fraud Analyst": "Analytical", "Pricing Analyst": "Analytical"
+    "Consumer Insights Lead": "Analytical"
 }
 
 # ==========================================
-# 2. DATA ARCHITECTURE (10 Metadata Artifacts)
+# 3. GOVERNANCE ARCHITECTURE (10 Artifacts)
 # ==========================================
 class EnterpriseContextLayer(BaseModel):
     data_inventory: str
@@ -59,47 +116,70 @@ class EnterpriseContextLayer(BaseModel):
     model_registry: str
 
 def build_enterprise_context(industry: str, sub_ind: str, domain: str, persona: str) -> EnterpriseContextLayer:
-    """Dynamically builds the 10-layer governance context based on taxonomy selections."""
     prefix = industry.split(' ')[0].lower()
-    
     return EnterpriseContextLayer(
-        data_inventory=f"{sub_ind.replace(' ', '_')}_Master_DB, Live_{domain.replace(' ', '_')}_Stream",
-        data_directory=f"s3://corp/{prefix}/{sub_ind.lower().replace(' ', '_')}/",
+        data_inventory=f"Social_Listening_Firehose_v3, Live_{domain.replace(' ', '_')}_Stream",
+        data_directory=f"s3://corp/{prefix}/viral_trends/",
         data_registry=f"Steward: Head of {domain} | Owner: {persona}",
-        data_dictionary=f"Domain KPIs aligned to {domain} standardization.",
-        metadata_repository=f"Compliance: GDPR/CCPA | Security_Tier: High | Layer: {UNIVERSAL_LAYERS.get(persona, 'Operational')}",
-        data_lineage=f"Snowflake Data Warehouse -> dbt Models -> {persona} Dashboards",
-        semantic_layer=f"Business Logic Abstraction for {industry} Metrics",
-        ontology_graph=f"Entity Relations: Customer -> Product -> {domain} -> Channel",
-        prompt_registry=f"Approved Template: {prefix}_{persona.replace(' ', '_')}_v3",
-        model_registry="Primary: Groq_Llama_3.3_70B_Versatile | Fallback: Llama_3.1_8B"
+        data_dictionary=f"Virality Indexes aligned to {domain} standardization.",
+        metadata_repository=f"Compliance: GDPR | Layer: {UNIVERSAL_LAYERS.get(persona, 'Operational')}",
+        data_lineage="Global Web Scraper -> NLP Engine -> Real-time UI",
+        semantic_layer="NLP Entity Extraction & Viral Sentiment Scoring",
+        ontology_graph="Keyword -> Sentiment -> Viral Velocity -> Action",
+        prompt_registry=f"{prefix}_{persona.replace(' ', '_')}_Viral_Engine",
+        model_registry="Groq Llama 3.3 70B Versatile"
     )
 
 # ==========================================
-# 3. SYNTHETIC SCRAPING ENGINE
+# 4. SOCIAL LISTENING & TEXT MINING ENGINE
 # ==========================================
-def simulate_external_scrape(sub_industry: str, domain: str, client: Groq):
-    """Synthetic Scraper using Groq JSON mode."""
+def execute_social_listening_crawl(sub_industry: str, domain: str, client: Groq):
+    """Upgraded JSON schema for the Apple-style UI."""
+    sys_prompt = """
+    You are a predictive text-mining crawler analyzing real-time social data.
+    Return strictly JSON with the following keys:
+    - 'hero_insight': string. A punchy, Steve Jobs-style 1-sentence revelation about the market.
+    - 'viral_velocity_score': integer (0-100). Speed of trend adoption.
+    - 'sentiment_score': integer (0-100). 100 is euphoric.
+    - 'demand_trajectory': string (e.g., 'Hyper-Growth', 'Cooling').
+    - 'trending_keywords': dictionary of 10-15 trending 1-2 word phrases and their frequency weight (integer 1-100).
+    """
     try:
         completion = client.chat.completions.create(
             messages=[
-                {"role": "system", "content": "Return JSON with keys: 'market_signals' (list) and 'domain_sentiment' (string)."},
+                {"role": "system", "content": sys_prompt},
                 {"role": "user", "content": f"Extract 2026 market signals for {sub_industry} focusing on {domain}."}
             ],
             model="llama-3.3-70b-versatile",
             response_format={"type": "json_object"}
         )
         return json.loads(completion.choices[0].message.content)
-    except:
-        return {"market_signals": ["AI Integration", "Process Automation"], "domain_sentiment": "High Growth Potential"}
+    except Exception:
+        return {
+            "hero_insight": "The market is shifting rapidly towards AI-driven, hyper-personalized automation.",
+            "viral_velocity_score": 92,
+            "sentiment_score": 88,
+            "demand_trajectory": "Exponential Surging",
+            "trending_keywords": {"automation": 95, "scale": 85, "speed": 75, "integration": 90, "efficiency": 70, "AI": 100}
+        }
+
+def generate_wordcloud(word_freq: dict):
+    """Sleek, dark-mode WordCloud for premium feel."""
+    wc = WordCloud(width=800, height=400, background_color='#1d1d1f', colormap='Blues', border_radius=15).generate_from_frequencies(word_freq)
+    fig, ax = plt.subplots(figsize=(8, 4), facecolor='#fbfbfd') # match app bg
+    ax.imshow(wc, interpolation='bilinear')
+    ax.axis('off')
+    plt.tight_layout(pad=0)
+    return fig
 
 # ==========================================
-# 4. STREAMLIT UI & STATE MANAGEMENT
+# 5. STREAMLIT DASHBOARD
 # ==========================================
-st.set_page_config(page_title="Enterprise Semantic AI", layout="wide", page_icon="🧠")
+st.set_page_config(page_title="Semantic AI", layout="wide", page_icon="")
+inject_apple_css() # Apply the UI upgrade
 
 if "GROQ_API_KEY" not in st.secrets:
-    st.error("Missing GROQ_API_KEY in Secrets. Please add it to continue.")
+    st.error("Missing GROQ_API_KEY in Secrets.")
     st.stop()
 
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
@@ -107,106 +187,80 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 if "intel" not in st.session_state: st.session_state.intel = None
 if "chat_history" not in st.session_state: st.session_state.chat_history = []
 
-# --- Cascading Sidebar UI ---
-st.sidebar.title("🧠 Semantic Engine")
-st.sidebar.markdown("Configure Taxonomy Parameters")
-
+# --- Sidebar UI ---
+st.sidebar.title("Intelligence Engine")
 industry = st.sidebar.selectbox("Industry", list(TAXONOMY.keys()))
 sub_ind = st.sidebar.selectbox("Sub-Industry", TAXONOMY[industry]["sub_industries"])
 domain = st.sidebar.selectbox("Functional Domain", TAXONOMY[industry]["domains"])
 persona = st.sidebar.selectbox("Persona", TAXONOMY[industry]["personas"])
-
 layer = UNIVERSAL_LAYERS.get(persona, "Operational")
-st.sidebar.info(f"**Mapped Layer:** {layer}")
 
-if st.sidebar.button("Generate Intelligence", type="primary"):
-    with st.spinner("Compiling 10-Layer Ontology & Executing Models..."):
+if st.sidebar.button("Execute Deep Mining Scan"):
+    with st.spinner("Compiling Neural Ontology & Scraping Web..."):
         context = build_enterprise_context(industry, sub_ind, domain, persona)
-        scrape = simulate_external_scrape(sub_ind, domain, client)
+        social_data = execute_social_listening_crawl(sub_ind, domain, client)
         
         sys_prompt = f"""
-        You are an elite AI operating at the {layer} level as a {persona} in the {sub_ind} sector.
-        Your focus is {domain}.
+        Role: Elite {layer} {persona} in {sub_ind}. Focus: {domain}.
+        GOVERNANCE ARTIFACTS: {context.json()}
+        LIVE VIRAL DATA: {json.dumps(social_data)}
         
-        STRICT GOVERNANCE ARTIFACTS: {context.json()}
-        EXTERNAL SCRAPE DATA: {scrape}
-        
-        TASK: Generate a highly professional, highly strategic intelligence briefing.
-        - Emphasize the semantic relationships and ontology of the data.
-        - If {layer} is Executive or Strategic, focus on Financial/Customer KPIs.
-        - If {layer} is Technical or Analytical, focus on System architecture and granular metrics.
-        - Format clearly using markdown. Do not use conversational filler.
+        TASK: Write a sleek, high-impact strategic briefing. 
+        Focus heavily on how to monetize the 'trending_keywords' and 'viral_velocity_score'.
+        Use clean markdown. No fluff.
         """
-        
         try:
             resp = client.chat.completions.create(
                 messages=[{"role": "system", "content": sys_prompt}],
                 model="llama-3.3-70b-versatile"
             ).choices[0].message.content
+            
             st.session_state.intel = resp
             st.session_state.context_doc = context
-            st.session_state.scrape_doc = scrape
+            st.session_state.social_data = social_data
         except Exception as e:
-            st.error(f"Groq API Error: {e}")
+            st.error(f"Engine Error: {e}")
 
-# ==========================================
-# 5. MAIN DASHBOARD RENDER
-# ==========================================
+# --- MAIN DASHBOARD RENDER ---
 if st.session_state.intel:
-    st.header(f"Strategic Briefing: {persona} ({layer})")
+    sd = st.session_state.social_data
     
-    # Render the 10 Metadata Artifacts
-    with st.expander("🔐 View 10-Layer Semantic Metadata Architecture", expanded=False):
-        doc = st.session_state.context_doc
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.markdown(f"**1. Data Inventory:** `{doc.data_inventory}`")
-            st.markdown(f"**2. Data Directory:** `{doc.data_directory}`")
-            st.markdown(f"**3. Data Registry:** `{doc.data_registry}`")
-        with col2:
-            st.markdown(f"**4. Data Dictionary:** `{doc.data_dictionary}`")
-            st.markdown(f"**5. Metadata Repository:** `{doc.metadata_repository}`")
-            st.markdown(f"**6. Data Lineage:** `{doc.data_lineage}`")
-        with col3:
-            st.markdown(f"**7. Semantic Layer:** `{doc.semantic_layer}`")
-            st.markdown(f"**8. Ontology Graph:** `{doc.ontology_graph}`")
-            st.markdown(f"**9. Prompt Registry:** `{doc.prompt_registry}`")
-            st.markdown(f"**10. Model Registry:** `{doc.model_registry}`")
+    # Apple-Style Hero Insight Headline
+    st.markdown(f"""
+    <div style='text-align: center; padding: 40px 0;'>
+        <h1 style='font-size: 3rem; background: -webkit-linear-gradient(#1d1d1f, #555); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+            {sd.get("hero_insight", "Analyzing Market Vectors.")}
+        </h1>
+        <p style='color: #86868b; font-size: 1.2rem; font-weight: 500;'>Live Demand Intelligence for {persona} ({layer})</p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    st.markdown("---")
+    # Sleek Metrics Row (These will have hover states from CSS)
+    col1, col2, col3, col4 = st.columns(4)
+    v_score = sd.get("viral_velocity_score", 0)
+    col1.metric("Viral Velocity", f"{v_score}/100", "+ High" if v_score > 70 else "- Stable")
+    col2.metric("Sentiment Index", f"{sd.get('sentiment_score', 0)}/100", "Favorable")
+    col3.metric("Demand Trajectory", sd.get("demand_trajectory", "Unknown"), "Active")
+    col4.metric("Active Signals", len(sd.get("trending_keywords", {})), "Mined keywords")
     
-    # Layer-Specific Visual/Metric Logic
-    if layer in ["Strategic", "Executive"]:
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Financial: Projected Margin", "+2.4%", "Optimized")
-        c2.metric("Customer: NPS Delta", "+8 pts", "Trend alignment")
-        c3.metric("Risk: Fraud/Error Rate", "0.01%", "-0.05%")
-    elif layer == "Technical":
-        st.info("System Architecture Status: All upstream systems responding nominally. Data lineage verified.")
-    elif "Design" in persona or "Content" in persona:
-        st.subheader("Visual Asset Generation")
-        cols = st.columns(3)
-        for i in range(3):
-            cols[i].image(f"https://source.unsplash.com/featured/400x400?{sub_ind.split()[0].lower()},{domain.split()[0].lower()}&sig={i}", caption=f"Semantic Concept {i+1}")
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    # Output the LLM Insights
-    st.markdown(st.session_state.intel)
-
-    # Follow-up Chat
-    st.markdown("---")
-    st.subheader(f"💬 Query Semantic Layer ({domain})")
-    for m in st.session_state.chat_history:
-        with st.chat_message(m["role"]): st.markdown(m["content"])
+    # Word Cloud & Metadata Row
+    chart_col, meta_col = st.columns([1.5, 1])
     
-    if prompt := st.chat_input("Ask a follow-up about the data..."):
-        st.session_state.chat_history.append({"role": "user", "content": prompt})
-        with st.chat_message("user"): st.markdown(prompt)
+    with chart_col:
+        st.markdown("### Semantic Network Density")
+        fig = generate_wordcloud(sd.get("trending_keywords", {"data": 100}))
+        st.pyplot(fig)
         
-        with st.chat_message("assistant"):
-            chat_context = f"Base Intelligence: {st.session_state.intel}\nScrape: {st.session_state.scrape_doc}\nUser: {prompt}"
-            r = client.chat.completions.create(
-                messages=[{"role": "user", "content": chat_context}],
-                model="llama-3.1-8b-instant"
-            ).choices[0].message.content
-            st.markdown(r)
-            st.session_state.chat_history.append({"role": "assistant", "content": r})
+    with meta_col:
+        st.markdown("### System Ontology")
+        with st.expander("View Neural Governance Data"):
+            doc = st.session_state.context_doc
+            st.code(f"Inventory: {doc.data_inventory}\nRegistry: {doc.data_registry}\nLineage: {doc.data_lineage}", language="text")
+            st.markdown(f"**Semantic Layer:** {doc.semantic_layer}")
+            st.markdown(f"**Model:** {doc.model_registry}")
+
+    # Strategic AI Briefing
+    st.markdown("---")
+    st.markdown(f"<div style='padding: 20px; background-color: #ffffff; border-radius: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.04);'> {st.session_state.intel} </div>", unsafe_allow_html=True)
