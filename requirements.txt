@@ -1,3 +1,5 @@
 streamlit
 groq
 pydantic
+matplotlib
+wordcloud
