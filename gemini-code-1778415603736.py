@@ -2,138 +2,155 @@ import streamlit as st
 from groq import Groq
 import json
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 # --- 1. DATA ARCHITECTURE (Governance Artifacts) ---
 class ContextLayer(BaseModel):
-    data_inventory: str   # List of sources
-    data_directory: str   # Storage paths/access
-    data_registry: str    # Ownership & versioning
-    data_dictionary: str  # Business terms definitions
-    metadata_repo: str    # Compliance & tagging logic
+    inventory: str
+    directory: str
+    registry: str
+    dictionary: Dict[str, str]
+    metadata_repo: str
 
-# --- 2. GOVERNANCE METADATA ENGINE ---
-def get_metadata_documentation(industry, sub_ind, persona):
-    """Provides specific metadata documentation for the chosen context."""
-    # This logic acts as the absolute guardrail for the LLM
-    doc = {
-        "Retail": {
-            "Fashion & Apparel": {
-                "inventory": "SKU_Master_v4, Trend_Crawl_2026, Social_Sentiment_API",
-                "dictionary": {"Trend_Score": "0-100 score based on TikTok/IG velocity", "Sell-Through": "Actual vs Projected sales %"}
-            }
-        },
-        "CPG": {
-            "Food & Beverage": {
-                "inventory": "Supply_Chain_Logistics_DB, Consumer_Health_Panel_2026",
-                "dictionary": {"LTV": "Customer Lifetime Value based on 12-month reorder", "Shelf_Life_Index": "Days until expiration delta"}
-            }
-        }
+# --- 2. GOVERNANCE & DOCUMENTATION ENGINE ---
+def get_metadata_context(industry: str, sub_ind: str, persona: str) -> ContextLayer:
+    """Provides the absolute governance guardrails for the LLM."""
+    # Documentation definitions as requested
+    inventories = {
+        "Fashion & Apparel": "SKU_Master_2026, Social_Crawl_V4, Fabric_Sustainability_Index",
+        "Consumer Electronics": "Hardware_Spec_Repo, Tech_Sentiment_V2, Return_Log_Analytics",
+        "Food & Beverage": "Supply_Chain_ERP, Consumer_Health_Panel_2026, Freshness_Logs",
+        "Personal Care & Beauty": "Ingredient_Safety_DB, IG_Beauty_Trends, Shelf_Velocity_Data"
     }
     
-    # Generic Persona metadata for specific personas
-    persona_metadata = {
-        "Designer": "Compliance: Visual Brand Guidelines 2026. Data: RGB/CMYK Hex Mappings.",
-        "Campaign Analyst": "Compliance: Privacy-First Attribution. Data: Conversion API (CAPI) Endpoints.",
-        "Merchandiser": "Compliance: Inventory FIFO. Data: Warehouse Stock-to-Sales Ratios."
+    dictionaries = {
+        "Fashion & Apparel": {"Trend_Velocity": "Mentions/Day on TikTok", "Sell-Through": "Actual vs Projected Sales %"},
+        "Food & Beverage": {"LTV": "Customer Lifetime Value (12mo)", "Waste_Index": "Unsold perishable delta"}
     }
 
-    ind_data = doc.get(industry, {}).get(sub_ind, {"inventory": "Generic_Source", "dictionary": {}})
-    
     return ContextLayer(
-        data_inventory=ind_data["inventory"],
-        data_directory=f"s3://{industry.lower()}-insights/{sub_ind.lower()}/",
-        data_registry=f"Owner: {persona} | Version: 2026.5.10",
-        data_dictionary=str(ind_data["dictionary"]),
-        metadata_repo=persona_metadata.get(persona, "Standard Enterprise Compliance")
+        inventory=inventories.get(sub_ind, "Enterprise_Data_Lake_General"),
+        directory=f"s3://corp-data/{industry.lower()}/{sub_ind.lower().replace(' ', '_')}/",
+        registry=f"Verified by {persona}_Dept | Version 2026.Q2",
+        dictionary=dictionaries.get(sub_ind, {"KPI": "Key Performance Indicator"}),
+        metadata_repo=f"Compliance: GDPR/SOC2 | Tags: {sub_ind}, {persona}, Strategic_Plan_2026"
     )
 
-# --- 3. CORE LOGIC ---
+# --- 3. LOGIC ENGINES ---
 def simulate_external_scrape(sub_industry: str, client: Groq):
+    """Synthetic Scraper using Groq JSON mode."""
     try:
         completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": "Return JSON with keys: 'video_trends' (list) and 'web_sentiment' (string)."},
-                {"role": "user", "content": f"2026 Market Trends for {sub_industry}"}
+                {"role": "user", "content": f"Extract 2026 market signals for {sub_industry}"}
             ],
             model="llama-3.3-70b-versatile",
             response_format={"type": "json_object"}
         )
         return json.loads(completion.choices[0].message.content)
     except:
-        return {"video_trends": ["Sustainable Materials", "AI Customization"], "web_sentiment": "High Growth"}
+        return {"video_trends": ["Sustainability", "AI Personalization"], "web_sentiment": "Positive"}
 
-# --- 4. UI COMPONENTS ---
-st.set_page_config(page_title="AI Insight Platform v2", layout="wide")
+# --- 4. STREAMLIT UI ---
+st.set_page_config(page_title="Enterprise AI Insights", layout="wide")
 
-if "GROQ_API_KEY" in st.secrets:
-    client = Groq(api_key=st.secrets["GROQ_API_KEY"])
-else:
-    st.error("Add GROQ_API_KEY to Secrets.")
+# API Key Validation
+if "GROQ_API_KEY" not in st.secrets:
+    st.error("Missing GROQ_API_KEY in Secrets. Please add it to continue.")
     st.stop()
 
-# Sidebar
-st.sidebar.header("Platform Controls")
+client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+
+# Sidebar Context Selection
+st.sidebar.title("🛠️ Context Engine")
 industry = st.sidebar.selectbox("Industry", ["Retail", "CPG"])
-sub_options = {"Retail": ["Fashion & Apparel", "Consumer Electronics"], "CPG": ["Food & Beverage", "Personal Care"]}
+sub_options = {
+    "Retail": ["Fashion & Apparel", "Consumer Electronics", "Home & Furniture"],
+    "CPG": ["Food & Beverage", "Personal Care & Beauty", "Household Cleaning"]
+}
 sub_ind = st.sidebar.selectbox("Sub-Industry", sub_options[industry])
 persona = st.sidebar.selectbox("Persona", ["Designer", "Campaign Analyst", "Merchandiser", "Brand Manager", "Digital Marketer"])
 
+# State Management
+if "intel" not in st.session_state: st.session_state.intel = None
+if "chat_history" not in st.session_state: st.session_state.chat_history = []
+
 if st.sidebar.button("Generate Intelligence", type="primary"):
-    with st.spinner("Processing Data Artifacts..."):
-        # Fetch Context & Scrape
-        context_doc = get_metadata_documentation(industry, sub_ind, persona)
+    with st.spinner("Analyzing Governance Artifacts..."):
+        context = get_metadata_context(industry, sub_ind, persona)
         scrape = simulate_external_scrape(sub_ind, client)
         
-        # Build System Prompt with Guardrails
         sys_prompt = f"""
-        Role: {persona} in {sub_ind}.
-        GOVERNANCE METADATA: {context_doc.json()}
-        LIVE SCRAPE: {scrape}
-        TASK: Generate a high-level briefing. 
-        IMPORTANT: If I am a Designer, provide 3 descriptive prompts for 'AI Visual Sketches'. 
-        If I am an Analyst, provide target metrics (ROAS, CPA).
+        You are an elite {persona} working in {sub_ind}.
+        GUARDRAILS: {context.json()}
+        EXTERNAL DATA: {scrape}
+        
+        TASK: Generate a high-priority intelligence report. 
+        - IF Designer: Generate 3 detailed prompts for moodboard sketches.
+        - IF Analyst: Generate Target ROAS/CPA metrics.
+        - GENERAL: Use professional, data-driven tone. No conversational filler.
         """
         
         try:
-            res = client.chat.completions.create(
+            resp = client.chat.completions.create(
                 messages=[{"role": "system", "content": sys_prompt}],
                 model="llama-3.3-70b-versatile"
             ).choices[0].message.content
-            st.session_state.intel = res
-            st.session_state.context = context_doc
+            st.session_state.intel = resp
+            st.session_state.context_doc = context
         except Exception as e:
-            st.error(f"Error: {e}")
+            st.error(f"API Error: {e}")
 
 # --- 5. RESULTS DISPLAY ---
-if "intel" in st.session_state:
-    st.title(f"Intelligence Briefing: {persona}")
+if st.session_state.intel:
+    st.header(f"Strategic Briefing: {persona}")
     
-    # 1. METADATA DOCUMENTATION TAB
-    with st.expander("📚 View Metadata & Governance Documentation"):
-        c = st.session_state.context
-        col1, col2 = st.columns(2)
-        col1.write("**Data Inventory:**"); col1.code(c.data_inventory)
-        col1.write("**Data Registry:**"); col1.code(c.data_registry)
-        col2.write("**Data Dictionary:**"); col2.code(c.data_dictionary)
-        col2.write("**Metadata Repository:**"); col2.code(c.metadata_repo)
-
-    # 2. DESIGNER VISUALS
-    if persona == "Designer":
-        st.subheader("🎨 Visual Moodboard Sketches")
-        cols = st.columns(3)
-        for i in range(3):
-            # Using a dynamic placeholder that simulates an AI generation result
-            cols[i].image(f"https://placehold.co/400x400/222/white?text=Sketch+Idea+{i+1}", 
-                          caption=f"AI Sketch Prompt {i+1}")
-    
-    # 3. ANALYST METRICS
-    elif persona == "Campaign Analyst":
-        st.subheader("📊 Key Performance Targets")
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Optimal ROAS", "5.4x", "+0.2")
-        c2.metric("Target CPA", "$9.50", "-12%")
-        c3.metric("Engagement Goal", "4.8%", "+1.1%")
+    # Metadata Documentation Module
+    with st.expander("📚 Metadata Governance Documentation"):
+        doc = st.session_state.context_doc
+        c1, c2 = st.columns(2)
+        c1.markdown(f"**Data Inventory:** `{doc.inventory}`")
+        c1.markdown(f"**Data Directory:** `{doc.directory}`")
+        c2.markdown(f"**Data Registry:** `{doc.registry}`")
+        c2.markdown(f"**Metadata Repository:** `{doc.metadata_repo}`")
+        st.info(f"**Data Dictionary:** {doc.dictionary}")
 
     st.markdown("---")
+
+    # Persona-Specific Visual Logic
+    if persona == "Designer":
+        st.subheader("🎨 AI-Generated Design Sketches")
+        # Fixed blank image issue with dynamic keyword search
+        search_term = sub_ind.lower().replace(" ", "-")
+        cols = st.columns(3)
+        for i in range(3):
+            img_url = f"https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=400&q={i}" if "Fashion" in sub_ind else f"https://loremflickr.com/400/400/{search_term},sketch?lock={i}"
+            cols[i].image(img_url, caption=f"Design Sketch Proposal {i+1}")
+
+    elif persona == "Campaign Analyst":
+        st.subheader("📊 Performance Metrics")
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Recommended ROAS", "4.8x", "+0.4")
+        col2.metric("Projected CPA", "$9.50", "-12%")
+        col3.metric("Engagement Goal", "5.2%", "+1.8%")
+
     st.markdown(st.session_state.intel)
+
+    # 6. FOLLOW-UP CHAT
+    st.markdown("---")
+    st.subheader("💬 Refinement Chat")
+    for m in st.session_state.chat_history:
+        with st.chat_message(m["role"]): st.markdown(m["content"])
+    
+    if prompt := st.chat_input("Adjust strategy..."):
+        st.session_state.chat_history.append({"role": "user", "content": prompt})
+        with st.chat_message("user"): st.markdown(prompt)
+        with st.chat_message("assistant"):
+            full_msg = f"Base Context: {st.session_state.intel}\nUser Query: {prompt}"
+            r = client.chat.completions.create(
+                messages=[{"role": "user", "content": full_msg}],
+                model="llama-3.1-8b-instant"
+            ).choices[0].message.content
+            st.markdown(r)
+            st.session_state.chat_history.append({"role": "assistant", "content": r})
