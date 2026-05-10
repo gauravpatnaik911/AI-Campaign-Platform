@@ -3,14 +3,12 @@ import json
 from pydantic import BaseModel
 
 # --- BULLETPROOF IMPORTS ---
-# If Groq fails, the app stops safely.
 try:
     from groq import Groq
 except ImportError:
     st.error("CRITICAL: 'groq' library not found. Please add it to requirements.txt.")
     st.stop()
 
-# If visual libraries fail, the app stays alive but disables the graph.
 try:
     import matplotlib.pyplot as plt
     from wordcloud import WordCloud
@@ -45,6 +43,10 @@ def inject_apple_css():
         }
         div.stButton > button:hover { background-color: #0077ED !important; transform: scale(1.02); }
         .streamlit-expanderHeader { font-weight: 600 !important; border-radius: 12px !important; }
+        
+        /* Make WordCloud visually rounded via CSS instead of Python */
+        [data-testid="stImage"] img { border-radius: 15px; }
+        
         #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
@@ -139,7 +141,8 @@ def execute_social_listening_crawl(sub_industry: str, domain: str, client: Groq)
 def generate_wordcloud(word_freq: dict):
     if not VISUALS_ENABLED:
         return None
-    wc = WordCloud(width=800, height=400, background_color='#1d1d1f', colormap='Blues', border_radius=15).generate_from_frequencies(word_freq)
+    # Removed border_radius to fix the TypeError!
+    wc = WordCloud(width=800, height=400, background_color='#1d1d1f', colormap='Blues').generate_from_frequencies(word_freq)
     fig, ax = plt.subplots(figsize=(8, 4), facecolor='#fbfbfd')
     ax.imshow(wc, interpolation='bilinear')
     ax.axis('off')
