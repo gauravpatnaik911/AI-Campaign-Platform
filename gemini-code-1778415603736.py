@@ -37,8 +37,9 @@ def inject_efficient_enterprise_aesthetic():
         
         div[data-testid="stVerticalBlock"] div[style*="border"] {
             border: 1px solid #E5E7EB !important; border-radius: 0px !important; 
-            background-color: #FFFFFF !important; padding: 1.25rem !important; 
+            background-color: #FFFFFF !important; padding: 1.5rem !important; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+            height: 100%;
         }
 
         .stButton>button {
@@ -50,7 +51,7 @@ def inject_efficient_enterprise_aesthetic():
         .stChatMessage { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; border-radius: 4px !important; padding: 1rem !important; }
         .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
         
-        /* Metric Styling for McKinsey KPIs */
+        /* Metric Styling */
         [data-testid="stMetricValue"] { font-size: 2rem !important; font-weight: 300 !important; color: #1C1C1C !important; }
         [data-testid="stMetricLabel"] { font-size: 0.8rem !important; font-weight: 700 !important; text-transform: uppercase !important; color: #F7901D !important; }
     </style>
@@ -59,7 +60,7 @@ def inject_efficient_enterprise_aesthetic():
 inject_efficient_enterprise_aesthetic()
 
 # ==========================================
-# 2. DATA ARCHITECTURE & TAXONOMY (Refined to 5)
+# 2. DATA ARCHITECTURE & TAXONOMY
 # ==========================================
 class ContextLayer(BaseModel):
     data_inventory: str
@@ -95,7 +96,7 @@ PERSONAS = [
 ]
 
 # ==========================================
-# 3. SCHEMA DEFINITIONS (Arbitrage Removed)
+# 3. SCHEMA DEFINITIONS
 # ==========================================
 class SourceLink(BaseModel):
     title: str
@@ -137,13 +138,12 @@ def simulate_external_scrape(sub_industry: str, client: Groq):
         }
 
 def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_data, client: Groq):
-    
     deliverable_formats = {
         "Creative Designer (Ops)": "For 'persona_deliverables', provide 3 'Pinterest-Style Sketch Prompts' that directly execute your pillars. The 'image_keyword' MUST be a highly descriptive 5-7 word prompt for an AI image generator describing a physical sketch.",
-        "Campaign Analyst (Ops)": "For 'persona_deliverables', provide 3 'Hyper-Targeted Experiment Hypotheses' that directly execute your pillars.",
-        "Merchandiser / Demand Sensing (Ops)": "For 'persona_deliverables', provide 3 'Algorithmic SKU Interventions' that directly execute your pillars.",
-        "Chief Marketing Officer (Strategy)": "For 'persona_deliverables', provide 3 'Macro Brand Repositioning Briefs' that directly execute your pillars.",
-        "VP of Supply Chain & Logistics (Strategy)": "For 'persona_deliverables', provide 3 'Logistics Resiliency Blueprints' that directly execute your pillars."
+        "Campaign Analyst (Ops)": "For 'persona_deliverables', provide 3 'Hyper-Targeted Experiment Hypotheses'.",
+        "Merchandiser / Demand Sensing (Ops)": "For 'persona_deliverables', provide 3 'Algorithmic SKU Interventions'.",
+        "Chief Marketing Officer (Strategy)": "For 'persona_deliverables', provide 3 'Macro Brand Repositioning Briefs'.",
+        "VP of Supply Chain & Logistics (Strategy)": "For 'persona_deliverables', provide 3 'Logistics Resiliency Blueprints'."
     }
     deliv_format = deliverable_formats.get(per, "Provide 3 highly functional tactical assets.")
 
@@ -157,7 +157,7 @@ def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_da
     1. Identify the "missing alpha"—the absolute bleeding-edge trend competitors are ignoring. 
     2. {deliv_format}
     3. The 'trend_implication' explicitly explains the "So What?"—why these specific virality keywords matter right now to the business bottom line.
-    4. For the 'kpi_impact_matrix', the 'mckinsey_rationale' must read like a McKinsey consultant explaining the structural economic drivers behind the metric change. Do not just say "sales go up". Explain the lever.
+    4. For the 'kpi_impact_matrix', the 'mckinsey_rationale' must read like a McKinsey consultant explaining the structural economic drivers behind the metric change.
 
     OUTPUT FORMAT (STRICT JSON EXACTLY AS SHOWN BELOW):
     {{
@@ -248,7 +248,7 @@ if st.session_state.auto_intelligence_generated:
     st.markdown(f"<div style='font-size:1.15rem; font-weight:300; line-height:1.5; color:#1C1C1C; padding: 1rem 0; border-bottom: 1px solid #E5E7EB; margin-bottom: 1.5rem;'><strong>Bleeding-Edge Signal:</strong> {sd.get('hero_insight', 'Market shift detected.')}</div>", unsafe_allow_html=True)
 
     # 2. TRENDS & THE "SO WHAT"
-    col_trends, col_implication = st.columns([1, 1.5])
+    col_trends, col_implication = st.columns([1, 1.5], gap="large")
     
     with col_trends:
         with st.container(border=True):
@@ -271,7 +271,7 @@ if st.session_state.auto_intelligence_generated:
     st.markdown("<h2>Actionable Strategy</h2>", unsafe_allow_html=True)
     pillars = doc.get('strategic_pillars', [])
     if pillars:
-        cols = st.columns(len(pillars))
+        cols = st.columns(len(pillars), gap="large")
         for i, pillar in enumerate(pillars):
             with cols[i]:
                 with st.container(border=True):
@@ -280,7 +280,7 @@ if st.session_state.auto_intelligence_generated:
 
     # 4. CHAT BOX
     st.markdown("""
-        <div style="background-color: #FFF9F2; border-left: 4px solid #F7901D; padding: 1.5rem; margin-top: 3rem; margin-bottom: 1rem;">
+        <div style="background-color: #FFF9F2; border-left: 4px solid #F7901D; padding: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem;">
             <h2 style="margin-top: 0 !important; border: none !important;">💬 Human-in-the-Loop Refinement</h2>
             <p style="margin: 0; color: #49494A; font-weight: 300;">Interact with the Agent below to adjust parameters, alter the tone, or approve the strategy before moving to execution deliverables.</p>
         </div>
@@ -307,7 +307,7 @@ if st.session_state.auto_intelligence_generated:
     deliverables = doc.get('persona_deliverables', [])
     
     if deliverables:
-        del_cols = st.columns(len(deliverables))
+        del_cols = st.columns(len(deliverables), gap="large")
         for i, item in enumerate(deliverables):
             with del_cols[i]:
                 d_title = item.get('title', 'Deliverable')
@@ -315,9 +315,13 @@ if st.session_state.auto_intelligence_generated:
                 
                 with st.container(border=True):
                     if "Designer" in sel_per:
-                        raw_kw = item.get('image_keyword', 'fashion design sketch')
+                        # FALLBACK: Ensure raw_kw has a value, even if the LLM forgets 'image_keyword'
+                        raw_kw = item.get('image_keyword') or item.get('title') or 'modern concept design'
                         encoded_kw = urllib.parse.quote(f"{raw_kw} pinterest style concept art sketch highly detailed clean white background")
-                        img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true"
+                        
+                        # THE FIX: Added a random seed so the API doesn't cache and drop the 2nd/3rd images
+                        img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true&seed={i+100}"
+                        
                         st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 0px; margin-bottom: 1rem;">', unsafe_allow_html=True)
                         st.markdown(f"**Visual Concept: {d_title}**")
                     else:
@@ -327,11 +331,12 @@ if st.session_state.auto_intelligence_generated:
 
     st.divider()
     
-    # 6. KPI IMPACT (Dynamically hides for Creative Designer) & SOURCES
-    col_kpi, col_sources = st.columns(2)
-    
-    with col_kpi:
-        if "Designer" not in sel_per:
+    # 6. KPI IMPACT & SOURCES (Dynamic Spacing Fix)
+    if "Designer" not in sel_per:
+        # Standard layout: 2 Columns
+        col_kpi, col_sources = st.columns(2, gap="large")
+        
+        with col_kpi:
             st.markdown("<h2>Core KPI Impact & Rationale</h2>", unsafe_allow_html=True)
             kpi_matrix = doc.get('kpi_impact_matrix', [])
             if kpi_matrix:
@@ -339,16 +344,25 @@ if st.session_state.auto_intelligence_generated:
                     with st.container(border=True):
                         st.metric(kpi.get('kpi_name', 'KPI'), kpi.get('impact_metric', '0%'))
                         st.markdown(f"<span style='color:#49494A; font-size:0.95rem; font-weight:300; line-height:1.5;'>{kpi.get('mckinsey_rationale', '')}</span>", unsafe_allow_html=True)
-        else:
-             st.markdown("")
 
-    with col_sources:
+        with col_sources:
+            st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
+            sources = doc.get('source_links', [])
+            if sources:
+                for src in sources:
+                    with st.container(border=True):
+                        st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
+    
+    else:
+        # Layout for Designer: Full width Sources (No awkward empty spaces)
         st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
         sources = doc.get('source_links', [])
         if sources:
-            for src in sources:
-                with st.container(border=True):
-                    st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
+            src_cols = st.columns(len(sources) if len(sources) > 0 else 1, gap="large")
+            for i, src in enumerate(sources):
+                with src_cols[i % len(src_cols)]:
+                    with st.container(border=True):
+                        st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
 
     # --- FOOTER ---
     st.markdown("<br>", unsafe_allow_html=True)
