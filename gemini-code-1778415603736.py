@@ -36,9 +36,6 @@ def inject_efficient_enterprise_aesthetic():
         h2 { font-size: 1.4rem !important; font-weight: 400 !important; letter-spacing: -0.01em !important; color: #1C1C1C !important; margin-top: 1.5rem !important; margin-bottom: 1rem !important; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.5rem;}
         h3 { font-size: 0.9rem !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; color: #F7901D !important; margin-bottom: 0.5rem !important; }
         
-        /* ----------------------------------------------------
-           THE FIX: Flexbox magic for Equal Height Columns 
-           ---------------------------------------------------- */
         [data-testid="column"] {
             display: flex;
             flex-direction: column;
@@ -56,10 +53,9 @@ def inject_efficient_enterprise_aesthetic():
             box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
         }
         
-        /* Inner container padding */
         div[data-testid="stVerticalBlock"] div[style*="border"] {
             padding: 1.25rem !important; 
-            border: none !important; /* Rely on wrapper border */
+            border: none !important; 
             box-shadow: none !important;
         }
 
@@ -72,7 +68,6 @@ def inject_efficient_enterprise_aesthetic():
         .stChatMessage { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; border-radius: 4px !important; padding: 1rem !important; }
         .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
         
-        /* Metric Styling for McKinsey KPIs */
         [data-testid="stMetricValue"] { font-size: 2rem !important; font-weight: 300 !important; color: #1C1C1C !important; }
         [data-testid="stMetricLabel"] { font-size: 0.8rem !important; font-weight: 700 !important; text-transform: uppercase !important; color: #F7901D !important; }
     </style>
@@ -211,15 +206,32 @@ def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_da
         return None
 
 def query_groq(prompt: str, system_context: str, client: Groq):
+    """THE FIX: A hardened chat logic engine that strips JSON and 'backend thinking'."""
+    sys_prompt = f"""
+    You are an elite enterprise Strategy Consultant. 
+    You are discussing the following active strategy parameters with the user:
+    {system_context}
+    
+    CRITICAL RULES:
+    1. Reply in a highly professional, conversational tone.
+    2. DO NOT output raw JSON, system data, or code blocks.
+    3. Provide direct, actionable advice based on the user's prompt.
+    """
     try:
         resp = client.chat.completions.create(
             messages=[
-                {"role": "system", "content": f"You are a helpful assistant refining the following strategy: {system_context}"},
+                {"role": "system", "content": sys_prompt},
                 {"role": "user", "content": prompt}
             ],
-            model="llama-3.1-8b-instant", temperature=0.5
+            model="llama-3.3-70b-versatile", # Upgraded model for better conversation following
+            temperature=0.4
         )
-        return resp.choices[0].message.content
+        content = resp.choices[0].message.content
+        
+        # STRIPPER FUNCTION: Removes <think>...</think> backend processing tags if present
+        clean_content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+        return clean_content
+        
     except Exception as e:
         return f"Chat error: {e}"
 
@@ -268,7 +280,7 @@ if st.session_state.auto_intelligence_generated:
     # 1. HERO INSIGHT
     st.markdown(f"<div style='font-size:1.15rem; font-weight:300; line-height:1.5; color:#1C1C1C; padding: 1rem 0; border-bottom: 1px solid #E5E7EB; margin-bottom: 1.5rem;'><strong>Bleeding-Edge Signal:</strong> {sd.get('hero_insight', 'Market shift detected.')}</div>", unsafe_allow_html=True)
 
-    # 2. TRENDS & THE "SO WHAT" (Perfectly aligned flex columns)
+    # 2. TRENDS & THE "SO WHAT"
     col_trends, col_implication = st.columns([1, 1.5], gap="large")
     
     with col_trends:
@@ -288,7 +300,7 @@ if st.session_state.auto_intelligence_generated:
             st.markdown("### The 'So What?' (Virality Implication)")
             st.markdown(f"<span style='color:#49494A; font-size:1rem; font-weight:300; line-height:1.6;'>{doc.get('trend_implication', 'Detailed business implication pending...')}</span>", unsafe_allow_html=True)
 
-    # 3. MECE PILLARS (Perfectly aligned flex columns)
+    # 3. MECE PILLARS 
     st.markdown("<h2>Actionable Strategy</h2>", unsafe_allow_html=True)
     pillars = doc.get('strategic_pillars', [])
     if pillars:
@@ -336,15 +348,11 @@ if st.session_state.auto_intelligence_generated:
                 
                 with st.container(border=True):
                     if "Designer" in sel_per:
-                        # THE FIX: Sanitize the LLM prompt to remove URL-breaking characters
                         raw_kw = item.get('image_keyword') or item.get('title') or 'modern concept design'
-                        clean_kw = re.sub(r'[^a-zA-Z0-9\s]', '', raw_kw) # Strips special characters
+                        clean_kw = re.sub(r'[^a-zA-Z0-9\s]', '', raw_kw)
                         encoded_kw = urllib.parse.quote(f"{clean_kw} pinterest style concept art sketch highly detailed clean white background")
-                        
-                        # THE FIX: Native st.image with dynamic random seed prevents timeout/caching issues
                         img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true&seed={i+500}"
                         st.image(img_url, use_container_width=True)
-                        
                         st.markdown(f"**Visual Concept: {d_title}**")
                     else:
                         st.markdown(f"**{d_title}**")
@@ -355,7 +363,6 @@ if st.session_state.auto_intelligence_generated:
     
     # 6. KPI IMPACT & SOURCES 
     if "Designer" not in sel_per:
-        # Standard layout: 2 Columns perfectly aligned via CSS
         col_kpi, col_sources = st.columns(2, gap="large")
         
         with col_kpi:
@@ -376,8 +383,6 @@ if st.session_state.auto_intelligence_generated:
                         st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
     
     else:
-        # Dynamic fix: If Designer is selected, let sources fill the screen horizontally 
-        # so there isn't a massive blank gap where the KPIs used to be.
         st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
         sources = doc.get('source_links', [])
         if sources:
