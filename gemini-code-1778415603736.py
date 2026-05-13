@@ -49,7 +49,6 @@ def inject_efficient_enterprise_aesthetic():
         .stProgress > div > div > div > div { background-color: #F7901D !important; height: 6px !important; }
         .stChatMessage { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; border-radius: 4px !important; padding: 1rem !important; }
         .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
-        .stDataFrame { border-radius: 0px !important; border: 1px solid #E5E7EB !important; }
         
         /* Metric Styling for McKinsey KPIs */
         [data-testid="stMetricValue"] { font-size: 2rem !important; font-weight: 300 !important; color: #1C1C1C !important; }
@@ -87,7 +86,6 @@ INDUSTRIES = {
     "Media & Entertainment": ["Streaming Platforms", "Gaming", "Digital Publishing"]
 }
 
-# Strictly 5 Personas (3 Ops, 2 Strategy)
 PERSONAS = [
     "Creative Designer (Ops)", 
     "Campaign Analyst (Ops)", 
@@ -97,14 +95,8 @@ PERSONAS = [
 ]
 
 # ==========================================
-# 3. SCHEMA DEFINITIONS (McKinsey Style Upgrades)
+# 3. SCHEMA DEFINITIONS (Arbitrage Removed)
 # ==========================================
-class StrategicSignal(BaseModel):
-    feature_name: str
-    virality_score: float      
-    yield_velocity: float      
-    mbb_action_title: str      
-
 class SourceLink(BaseModel):
     title: str
     url: str
@@ -118,7 +110,6 @@ class OmniverseIntelligence(BaseModel):
     proactive_alert: str 
     trend_implication: str
     strategic_pillars: List[Dict[str, str]]
-    signals: List[StrategicSignal]
     kpi_impact_matrix: List[KPIImpact] 
     persona_deliverables: List[Dict[str, str]]
     source_links: List[SourceLink]
@@ -176,9 +167,6 @@ def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_da
             {{"title": "string", "description": "string (Exact execution instructions)"}},
             {{"title": "string", "description": "string"}},
             {{"title": "string", "description": "string"}}
-        ],
-        "signals": [
-            {{"feature_name": "string (Name of initiative)", "virality_score": 90.5, "yield_velocity": 2.4, "mbb_action_title": "string (Why do this?)"}}
         ],
         "kpi_impact_matrix": [
             {{"kpi_name": "string (e.g., CAC, Margin)", "impact_metric": "string (e.g., -15%)", "mckinsey_rationale": "string (McKinsey-style economic rationale)"}}
@@ -338,26 +326,8 @@ if st.session_state.auto_intelligence_generated:
                     st.markdown(f"<span style='color:#49494A; font-size:0.9rem; font-weight:300;'>{d_desc}</span>", unsafe_allow_html=True)
 
     st.divider()
-
-    # 6. FUNCTIONAL ARBITRAGE MATRIX
-    st.markdown("<h2>Functional Arbitrage & Prioritization</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='font-weight: 300; margin-bottom: 1.5rem;'>The <strong>Arbitrage Index</strong> mathematically prioritizes initiatives that offer the highest virality relative to execution yield, optimizing budget allocation.</p>", unsafe_allow_html=True)
     
-    signals = doc.get('signals', [])
-    if signals:
-        try:
-            sig_df = pd.DataFrame(signals)
-            sig_df['Arbitrage Index'] = (sig_df['virality_score'] * sig_df['yield_velocity']).round(2)
-            sig_df = sig_df.sort_values(by='Arbitrage Index', ascending=False)
-            
-            sig_df = sig_df.rename(columns={"feature_name": "Initiative", "mbb_action_title": "Execution Directive", "virality_score": "Virality Score", "yield_velocity": "Yield Velocity"})
-            st.dataframe(sig_df, use_container_width=True, hide_index=True)
-        except Exception as e:
-            st.warning("Matrix rendering issue.")
-            
-    st.divider()
-    
-    # 7. KPI IMPACT (Dynamically hides for Creative Designer) & SOURCES
+    # 6. KPI IMPACT (Dynamically hides for Creative Designer) & SOURCES
     col_kpi, col_sources = st.columns(2)
     
     with col_kpi:
