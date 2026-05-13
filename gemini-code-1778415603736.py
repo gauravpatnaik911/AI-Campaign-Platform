@@ -2,7 +2,6 @@ import streamlit as st
 import json
 import pandas as pd
 import urllib.parse
-import os
 from pydantic import BaseModel
 from typing import List, Dict
 
@@ -14,79 +13,145 @@ except ImportError:
     st.stop()
 
 # ==========================================
-# 1. TIGER ANALYTICS BRANDING & UI INJECTION
+# 1. TIGER ANALYTICS x KYNDRYL AESTHETIC
 # ==========================================
-st.set_page_config(page_title="Tiger Analytics | Sense & Respond OS", layout="wide", page_icon="🐅")
+st.set_page_config(page_title="Tiger Analytics | Sense & Respond OS", layout="wide")
 
-# Logo Integration (Ensure 'tiger_logo.png' is in your repo)
 try:
     st.logo("tiger_logo.png", icon_image="tiger_logo.png")
 except Exception:
-    pass # Fails gracefully if the logo isn't uploaded yet
+    pass
 
-def inject_tiger_aesthetic():
+def inject_enterprise_aesthetic():
     st.markdown("""
     <style>
-        /* Base Typography & Background */
+        /* Base Editorial Reset */
         html, body, [class*="css"] {
-            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #FFFFFF;
-            color: #1C1C1C; /* Tiger Primary Dark */
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #FAFAFA;
+            color: #1C1C1C;
         }
-        
-        /* Change the top header line to Tiger Analytics Orange */
-        header[data-testid="stHeader"] {
-            background-color: #FFFFFF;
-            border-bottom: 4px solid #F7901D; /* Tiger Primary Orange */
-        }
-        
-        /* Top-Down Hierarchy Headers */
-        h1 { font-weight: 800; border-bottom: 3px solid #F7901D; padding-bottom: 10px; color: #1C1C1C !important; }
-        h2 { font-weight: 700; color: #1C1C1C !important; border-left: 6px solid #F7901D; padding-left: 12px; margin-top: 1.5rem !important; }
-        h3 { font-weight: 600; color: #49494A !important; } /* Tiger Primary Grey */
 
-        /* Brand the buttons */
+        /* Top Header Strip */
+        header[data-testid="stHeader"] {
+            background-color: #FAFAFA;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        /* Massive, Lightweight Typography (Kyndryl Style) */
+        h1 {
+            font-size: 3.8rem !important;
+            font-weight: 300 !important;
+            letter-spacing: -0.04em !important;
+            color: #1C1C1C !important;
+            line-height: 1.1 !important;
+            padding-bottom: 1rem !important;
+            border-bottom: none !important;
+        }
+        h2 {
+            font-size: 2.2rem !important;
+            font-weight: 300 !important;
+            letter-spacing: -0.02em !important;
+            color: #1C1C1C !important;
+            margin-top: 3rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+        h3 {
+            font-size: 0.85rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.15em !important;
+            color: #F7901D !important; /* Tiger Orange */
+            border-bottom: 1px solid #E5E7EB !important;
+            padding-bottom: 0.5rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+
+        /* Bare, Structural Metrics */
+        [data-testid="stMetric"] {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            border-top: 2px solid #1C1C1C !important;
+            padding-top: 1rem !important;
+        }
+        [data-testid="stMetricValue"] {
+            font-size: 3.5rem !important;
+            font-weight: 200 !important;
+            letter-spacing: -0.03em !important;
+            color: #1C1C1C !important;
+        }
+        [data-testid="stMetricLabel"] {
+            font-size: 0.8rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.1em !important;
+            color: #71717A !important;
+        }
+
+        /* Sharp, High-Contrast Buttons */
         .stButton>button {
             background-color: #1C1C1C !important;
             color: #FFFFFF !important;
-            border: 1px solid #1C1C1C !important;
-            border-radius: 4px !important;
-            font-weight: 700 !important;
-            padding: 12px 24px !important;
-            transition: all 0.3s ease-in-out !important;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border: none !important;
+            border-radius: 0px !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.1em !important;
+            padding: 1rem 2rem !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
         .stButton>button:hover {
             background-color: #F7901D !important;
             color: #1C1C1C !important;
-            border-color: #F7901D !important;
-            box-shadow: 0 4px 10px rgba(247, 144, 29, 0.3) !important;
             transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(247, 144, 29, 0.15) !important;
         }
 
-        /* Metrics & Containers */
-        [data-testid="stMetric"] {
-            background-color: #FFFFFF;
-            border: 1px solid #E2E2E2; /* Muted Grey */
-            border-radius: 4px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-top: 4px solid #18749C; /* Tiger Secondary Blue */
+        /* Editorial Alerts (Dark Mode Cards inside Light UI) */
+        .stAlert {
+            background-color: #1C1C1C !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 0px !important;
+            border-left: 4px solid #F7901D !important;
+            padding: 2rem !important;
         }
-        
-        /* Alerts & Info Boxes */
-        .stAlert { border-left: 5px solid #F7901D !important; background-color: #FFF9F2 !important; color: #1C1C1C !important;}
-        .stInfo { border-left: 5px solid #02C2A2 !important; } /* Tiger Secondary Teal */
-        
+        .stAlert p {
+            color: #FFFFFF !important;
+            font-weight: 300 !important;
+            font-size: 1.1rem !important;
+            letter-spacing: 0.02em !important;
+        }
+
+        /* Structural Containers */
+        div[data-testid="stVerticalBlock"] div[style*="border"] {
+            border: 1px solid #E5E7EB !important;
+            border-radius: 0px !important;
+            background-color: #FFFFFF !important;
+            padding: 2.5rem !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02) !important;
+        }
+
+        /* Thin Dividers */
+        hr {
+            border-top: 1px solid #E5E7EB !important;
+            margin: 3rem 0 !important;
+        }
+
         /* Progress Bars */
         .stProgress > div > div > div > div { background-color: #F7901D !important; }
 
-        .block-container { padding-top: 2rem; padding-bottom: 2rem; }
+        /* Whitespace & Padding */
+        .block-container { padding-top: 4rem; padding-bottom: 4rem; max-width: 1400px; }
+        
+        /* DataFrames */
+        .stDataFrame { border-radius: 0px !important; border: 1px solid #E5E7EB !important; }
     </style>
     """, unsafe_allow_html=True)
 
-inject_tiger_aesthetic()
+inject_enterprise_aesthetic()
 
 # ==========================================
 # 2. DATA ARCHITECTURE & GOVERNANCE
@@ -253,7 +318,7 @@ def query_groq(prompt: str, system_context: str, client: Groq):
         return f"Chat error: {e}"
 
 # ==========================================
-# 6. STREAMLIT APP RENDERING
+# 6. APP RENDERING
 # ==========================================
 
 # --- STATE MANAGEMENT ---
@@ -263,10 +328,10 @@ if "auto_intelligence_generated" not in st.session_state: st.session_state.auto_
 if "context_layer" not in st.session_state: st.session_state.context_layer = None
 
 # --- MAIN TITLE ---
-st.title("🐅 Tiger Analytics | Sense & Respond OS")
+st.title("Tiger Analytics | Sense & Respond OS")
 
 # --- SIDEBAR CONTROLS ---
-st.sidebar.title("⚡ Marketing OS")
+st.sidebar.markdown("### Operational Parameters")
 sel_ind = st.sidebar.selectbox("Industry Ecosystem", list(INDUSTRIES.keys()))
 sel_sub = st.sidebar.selectbox("Sub-Industry Segment", INDUSTRIES[sel_ind])
 sel_per = st.sidebar.selectbox("Autonomous Agent Persona", PERSONAS)
@@ -278,7 +343,7 @@ if "GROQ_API_KEY" not in st.secrets:
     st.stop()
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
-if st.sidebar.button("Run Sense & Respond Sequence", type="primary", use_container_width=True):
+if st.sidebar.button("Execute Autonomous Sequence", type="primary", use_container_width=True):
     with st.spinner("SENSE PHASE: Scanning global firehose for anomalies..."):
         ctx = seed_context_layer(sel_ind, sel_sub, sel_per)
         st.session_state.context_layer = ctx
@@ -297,47 +362,45 @@ if st.session_state.auto_intelligence_generated:
     sd = st.session_state.scraped_data
 
     if not isinstance(doc, dict):
-        st.warning("🔄 System architecture has been updated. Please click 'Run Sense & Respond Sequence' again to sync the new data format.")
+        st.warning("🔄 System architecture has been updated. Please click 'Execute Autonomous Sequence' again.")
         st.stop()
     
-    # 1. RAW DATA EXPANDER
-    with st.expander("📡 View Raw Sense Engine Data & Governance Artifacts", expanded=False):
+    # 1. RAW DATA EXPANDER (Clean style)
+    with st.expander("View Raw Sense Engine Data & Governance Artifacts", expanded=False):
         st.json(sd)
         st.markdown("**Active Governance Artifacts Enforced:**")
         st.code(st.session_state.context_layer.model_dump_json(indent=2), language="json")
 
-    # 2. THE PROACTIVE ALERT
-    st.info("System generated proactive response:")
-    with st.container(border=True):
-        st.markdown(f"**{doc.get('proactive_alert', 'ALERT: Anomaly Detected.')}**")
+    # 2. THE PROACTIVE ALERT (Kyndryl dark mode style block)
+    st.info(f"**{doc.get('proactive_alert', 'ALERT: Anomaly Detected.')}**")
 
     st.divider()
     
     # 3. VELOCITY & RISK
     col_vel, col_risk = st.columns(2)
     with col_vel:
-        st.metric("Viral Velocity of Anomaly", f"{sd.get('viral_velocity_score', 85)} / 100")
+        st.metric("Viral Velocity Signal", f"{sd.get('viral_velocity_score', 85)}")
     with col_risk:
-        st.error(f"**Linchpin Risk:** {doc.get('linchpin_risk', 'N/A')}")
+        st.markdown("### Structural Linchpin Risk")
+        st.markdown(f"<p style='color: #49494A; font-size: 1.1rem;'>{doc.get('linchpin_risk', 'N/A')}</p>", unsafe_allow_html=True)
         
     st.divider()
 
     # 4. MECE PILLARS (Missing Alpha)
-    st.subheader(f"Actionable 'Missing Alpha' Strategy")
+    st.markdown(f"<h2>Actionable 'Missing Alpha' Strategy</h2>", unsafe_allow_html=True)
     pillars = doc.get('strategic_pillars', [])
     if pillars:
         cols = st.columns(len(pillars))
         for i, pillar in enumerate(pillars):
             with cols[i]:
                 with st.container(border=True):
-                    st.markdown(f"#### 0{i+1}")
-                    st.markdown(f"**{pillar.get('title', '')}**")
-                    st.markdown(f"<span style='color:#49494A'>{pillar.get('description', '')}</span>", unsafe_allow_html=True)
+                    st.markdown(f"### 0{i+1} : {pillar.get('title', '').upper()}")
+                    st.markdown(f"<span style='color:#49494A; font-size:1.05rem; font-weight: 300;'>{pillar.get('description', '')}</span>", unsafe_allow_html=True)
 
     st.divider()
 
     # 5. EXCLUSIVE PERSONA DELIVERABLES (PINTEREST GENERATOR)
-    st.subheader(f"Exclusive Deliverables: {sel_per.split(' ')[0]}")
+    st.markdown(f"<h2>Exclusive Deliverables: {sel_per.split(' ')[0]}</h2>", unsafe_allow_html=True)
     deliverables = doc.get('persona_deliverables', [])
     
     if deliverables:
@@ -352,19 +415,17 @@ if st.session_state.auto_intelligence_generated:
                         raw_kw = item.get('image_keyword', 'fashion design sketch')
                         encoded_kw = urllib.parse.quote(f"{raw_kw} pinterest style concept art sketch highly detailed clean white background")
                         img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true"
-                        st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 4px; margin-bottom: 12px; border: 1px solid #E2E2E2;">', unsafe_allow_html=True)
+                        st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 0px; margin-bottom: 1rem;">', unsafe_allow_html=True)
                         st.markdown(f"**Visual Concept: {d_title}**")
                     else:
                         st.markdown(f"**Tactical Asset: {d_title}**")
                     
-                    st.markdown(f"<span style='color:#49494A'>{d_desc}</span>", unsafe_allow_html=True)
-    else:
-        st.info(f"No specific tactical deliverables generated for {sel_per}.")
+                    st.markdown(f"<span style='color:#49494A; font-size:1.05rem; font-weight: 300;'>{d_desc}</span>", unsafe_allow_html=True)
 
     st.divider()
 
-    # 6. ARBITRAGE MATRIX (Now matching the Orange/Grey Data Viz Brand logic)
-    st.subheader("Initiative Prioritization & Arbitrage")
+    # 6. ARBITRAGE MATRIX
+    st.markdown("<h2>Initiative Prioritization & Arbitrage</h2>", unsafe_allow_html=True)
     signals = doc.get('signals', [])
     if signals:
         try:
@@ -372,10 +433,7 @@ if st.session_state.auto_intelligence_generated:
             sig_df['Arbitrage Index'] = (sig_df['virality_score'] * sig_df['yield_velocity']).round(2)
             sig_df = sig_df.sort_values(by='Arbitrage Index', ascending=False)
             sig_df = sig_df.rename(columns={"feature_name": "Initiative", "mbb_action_title": "Execution Directive", "virality_score": "Virality Score", "yield_velocity": "Yield Velocity"})
-            st.dataframe(
-                sig_df.style.background_gradient(subset=['Arbitrage Index'], cmap='Oranges'), 
-                use_container_width=True, hide_index=True
-            )
+            st.dataframe(sig_df, use_container_width=True, hide_index=True)
         except Exception:
             st.warning("Matrix rendering issue.")
             
@@ -384,16 +442,16 @@ if st.session_state.auto_intelligence_generated:
     # 7. KPI & SOURCES
     col_kpi, col_sources = st.columns(2)
     with col_kpi:
-        st.subheader("Core KPI Impact")
+        st.markdown("<h2>Core KPI Impact</h2>", unsafe_allow_html=True)
         kpi_matrix = doc.get('kpi_impact_matrix', {})
         if kpi_matrix:
             for k, v in kpi_matrix.items():
                 with st.container(border=True):
                     st.markdown(f"**{k}**")
-                    st.caption(v)
+                    st.markdown(f"<span style='color:#49494A; font-size:1.05rem; font-weight: 300;'>{v}</span>", unsafe_allow_html=True)
                     
     with col_sources:
-        st.subheader("Epistemic Origins & Sources")
+        st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
         sources = doc.get('source_links', [])
         if sources:
             for src in sources:
@@ -403,7 +461,7 @@ if st.session_state.auto_intelligence_generated:
     st.divider()
 
     # 8. HUMAN-IN-THE-LOOP CHAT
-    st.markdown("### 💬 Human-in-the-Loop Refinement")
+    st.markdown("<h2>Human-in-the-Loop Refinement</h2>", unsafe_allow_html=True)
     for msg in st.session_state.chat_history:
         with st.chat_message(msg["role"]): st.markdown(msg["content"])
             
@@ -420,12 +478,14 @@ if st.session_state.auto_intelligence_generated:
     # --- TIGER ANALYTICS OFFICIAL FOOTER ---
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("""
-        <div style='text-align: center; color: #49494A; font-size: 0.85rem; border-top: 1px solid #E2E2E2; padding-top: 20px;'>
-            © 2022 - 2023, Tiger Analytics Inc; All rights reserved.<br>
-            <i>Powered by Experience Consulting Team</i>
+        <div style='text-align: left; color: #71717A; font-size: 0.8rem; font-weight: 600; border-top: 1px solid #E5E7EB; padding-top: 2rem; text-transform: uppercase; letter-spacing: 0.05em;'>
+            © 2022 - 2026, Tiger Analytics Inc. All rights reserved.<br>
+            <span style='font-weight: 300; letter-spacing: 0;'>Powered by Experience Consulting Team</span>
         </div>
     """, unsafe_allow_html=True)
 
 else:
-    st.markdown("### Welcome to the Sense & Respond OS")
-    st.write("👈 Configure your parameters and click **Run Sense & Respond Sequence** to trigger an autonomous agent.")
+    # Editorial Welcome State
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: left; font-size: 3rem !important; margin-top: 0 !important; color: #1C1C1C !important;'>Welcome to the Sense & Respond OS.</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 1.25rem; font-weight: 300; color: #49494A; max-width: 700px;'>Configure your operational parameters in the sidebar and execute the autonomous sequence to detect real-time anomalies and trigger agentic response workflows.</p>", unsafe_allow_html=True)
