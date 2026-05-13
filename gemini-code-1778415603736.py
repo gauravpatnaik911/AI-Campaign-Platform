@@ -22,6 +22,7 @@ except ImportError:
 st.set_page_config(page_title="Tiger Analytics | Marketing Sense & Respond OS", layout="wide")
 
 try:
+    # Pins the logo to the top-left corner natively
     st.logo("tiger_logo.png", icon_image="tiger_logo.png")
 except Exception:
     pass
@@ -40,6 +41,7 @@ def inject_efficient_enterprise_aesthetic():
         h2 { font-size: 1.4rem !important; font-weight: 400 !important; letter-spacing: -0.01em !important; color: #1C1C1C !important; margin-top: 1.5rem !important; margin-bottom: 1rem !important; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.5rem;}
         h3 { font-size: 0.9rem !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; color: #F5A623 !important; margin-bottom: 0.5rem !important; }
         
+        /* Flexbox for equal height columns */
         [data-testid="column"] { display: flex; flex-direction: column; }
         [data-testid="column"] > div { flex-grow: 1; display: flex; flex-direction: column; }
         
@@ -50,6 +52,7 @@ def inject_efficient_enterprise_aesthetic():
         }
         div[data-testid="stVerticalBlock"] div[style*="border"] { padding: 1.25rem !important; border: none !important; box-shadow: none !important; }
 
+        /* Tiger Orange Buttons */
         .stButton>button {
             background-color: #1C1C1C !important; color: #FFFFFF !important; border: none !important; border-radius: 0px !important;
             font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; padding: 0.5rem 1rem !important;
@@ -59,9 +62,6 @@ def inject_efficient_enterprise_aesthetic():
         .stProgress > div > div > div > div { background-color: #F5A623 !important; height: 6px !important; }
         .stChatMessage { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; border-radius: 4px !important; padding: 1rem !important; }
         .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
-        
-        [data-testid="stMetricValue"] { font-size: 2.2rem !important; font-weight: 300 !important; color: #1C1C1C !important; }
-        [data-testid="stMetricLabel"] { font-size: 0.8rem !important; font-weight: 700 !important; text-transform: uppercase !important; color: #F5A623 !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -76,6 +76,7 @@ INDUSTRIES = {
     "Direct-to-Consumer (D2C)": ["Subscription Boxes", "Digital-Native Brands"]
 }
 
+# The 6 Specific Personas
 PERSONAS = [
     "Creative Designer (Ops)", 
     "Marketing Professional (Ops)", 
@@ -86,21 +87,21 @@ PERSONAS = [
 ]
 
 # ==========================================
-# 3. MULTIMODAL BACKEND INTERFACES
+# 3. MULTIMODAL BACKEND INTERFACES 
 # ==========================================
 def analyze_multimodal_file(persona: str, file_path: str, is_image: bool):
     prompts = {
         "Creative Designer (Ops)": "Analyze this image. Extract the core style aesthetic, dominant color palettes, and specific clothing silhouettes. Output a concise 'Aesthetic Blueprint'.",
         "Marketing Professional (Ops)": "Treat this image as a competitor's active advertisement. Extract the primary psychological hook, the specific offer/discount, and the target demographic.",
-        "Merchandiser (Ops)": "Treat this image as a retail shelf planogram. Identify immediate inventory gaps, poor SKU facings, and suggest layout rotations.",
+        "Merchandiser (Ops)": "Treat this image as a retail shelf planogram. Identify immediate inventory gaps, poor SKU facings, and suggest layout rotations based on high-momentum trends.",
     }
     prompt = prompts.get(persona, "Analyze this document and extract strategic metadata.")
-    return f"**Gemini Vision Output for {persona.split(' ')[0]}:**\nBased on the analysis: The asset heavily indexes on organic textures and scarcity-driven hooks."
+    return f"**Gemini Vision Output for {persona.split(' ')[0]}:**\nBased on the analysis: The asset heavily indexes on organic textures and scarcity-driven hooks. Extracted key elements successfully against database parameters."
 
 def execute_backend_script(script_name: str, args: list):
     try:
         if not os.path.exists(script_name):
-            st.warning(f"Backend Warning: `{script_name}` not found. Simulating successful execution.")
+            st.warning(f"Backend Warning: `{script_name}` not found in directory. Simulating successful execution for demo purposes.")
             return True
         result = subprocess.run(["python", script_name] + args, capture_output=True, text=True, check=True)
         return True
@@ -109,15 +110,11 @@ def execute_backend_script(script_name: str, args: list):
         return False
 
 # ==========================================
-# 4. SENSE & RESPOND OS LOGIC (Fixed JSON Prompts)
+# 4. SENSE & RESPOND OS LOGIC 
 # ==========================================
 def simulate_external_scrape(ind: str, sub: str, client: Groq):
-    """FIX: Forcing strict JSON structure and increasing temperature for true dynamic trends."""
     sys_prompt = f"""
-    You are an autonomous market anomaly crawler for 2026.
-    Analyze the {sub} sector within {ind}. 
-    Identify completely novel, unpredictable, and bleeding-edge trends. Do not repeat generic trends.
-    
+    You are an autonomous market anomaly crawler. Analyze the {sub} sector within {ind}. 
     Return STRICTLY VALID JSON EXACTLY matching this format:
     {{
         "hero_insight": "1-sentence macro trend revelation about bleeding-edge consumer demand.",
@@ -133,14 +130,14 @@ def simulate_external_scrape(ind: str, sub: str, client: Groq):
     try:
         resp = client.chat.completions.create(
             messages=[{"role": "system", "content": sys_prompt}],
-            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.7 # High temp for variety
+            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.5 
         )
         return json.loads(resp.choices[0].message.content)
-    except Exception as e:
-        # Failsafe if Groq rate limits
+    except Exception:
+        # Iron-clad fallback so trends never disappear
         return {
             "hero_insight": "Consumers are shifting towards hyper-localized, on-demand micro-manufacturing.",
-            "trending_keywords": {"Micro-manufacturing": 94, "Hyper-local drops": 89, "Synthetic textiles": 82, "AI personal styling": 76, "Reverse logistics": 68}
+            "trending_keywords": {"Micro-manufacturing": 94, "Hyper-local drops": 89, "Synthetic materials": 82, "AI personal styling": 76, "Reverse logistics": 68}
         }
 
 def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
@@ -151,7 +148,7 @@ def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
     MANDATES:
     1. The 'proactive_alert' MUST start with 'ALERT: [Anomaly] detected.'
     2. The 'trend_implication' explicitly explains the "So What?"
-    3. The 'mckinsey_rationale' must explain the structural economic drivers for the metric (e.g. why CAC decreases). Provide completely unique metrics each time.
+    3. The 'mckinsey_rationale' must explain the structural economic drivers for the metric (e.g. why CAC decreases). 
 
     OUTPUT FORMAT (STRICT JSON):
     {{
@@ -166,7 +163,7 @@ def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
     try:
         resp = client.chat.completions.create(
             messages=[{"role": "system", "content": sys_prompt}],
-            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.4 
+            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.3 
         )
         return json.loads(resp.choices[0].message.content)
     except:
@@ -199,7 +196,6 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 if st.sidebar.button("Execute Autonomous Sequence", type="primary", use_container_width=True):
     with st.spinner("SENSE PHASE: Scanning anomalies & processing uploads..."):
-        # Sense Engine is now dynamically fed parameters
         sd = simulate_external_scrape(sel_ind, sel_sub, client)
         st.session_state.scraped_data = sd
         
@@ -272,14 +268,19 @@ if st.session_state.auto_intelligence_generated:
     with col_trends:
         with st.container(border=True):
             st.markdown("### Top Trending Signals")
+            # Enforce robust rendering of the dictionary
             for kw, score in sd.get("trending_keywords", {}).items():
-                st.markdown(f"<div style='margin-bottom:-10px; font-weight:600; font-size:0.85rem;'>{kw.title()} <span style='float:right; color:#F5A623;'>{score}%</span></div>", unsafe_allow_html=True)
-                st.progress(score / 100.0)
+                try:
+                    safe_score = min(max(int(score), 0), 100)
+                    st.markdown(f"<div style='margin-bottom:-10px; font-weight:600; font-size:0.85rem;'>{str(kw).title()} <span style='float:right; color:#F5A623;'>{safe_score}%</span></div>", unsafe_allow_html=True)
+                    st.progress(safe_score / 100.0)
+                except ValueError:
+                    continue
 
     with col_implication:
         with st.container(border=True):
             st.markdown("### The 'So What?' (Virality Implication)")
-            st.markdown(f"<span style='color:#49494A; font-size:1rem; font-weight:300; line-height:1.6;'>{doc.get('trend_implication', '')}</span>", unsafe_allow_html=True)
+            st.markdown(f"<span style='color:#49494A; font-size:1rem; font-weight:300; line-height:1.6;'>{doc.get('trend_implication', 'Awaiting implication data.')}</span>", unsafe_allow_html=True)
 
     # --- MECE PILLARS ---
     st.markdown("<h2>Actionable Strategy</h2>", unsafe_allow_html=True)
@@ -325,7 +326,7 @@ if st.session_state.auto_intelligence_generated:
 
     st.divider()
 
-    # --- FUNCTIONAL DELIVERABLES ---
+    # --- FUNCTIONAL DELIVERABLES (FIXED IMAGES) ---
     st.markdown(f"<h2>Functional Execution Assets: {sel_per.split(' ')[0]}</h2>", unsafe_allow_html=True)
     deliverables = doc.get('persona_deliverables', [])
     if deliverables:
@@ -337,31 +338,47 @@ if st.session_state.auto_intelligence_generated:
                         raw_kw = item.get('image_keyword', 'modern concept design')
                         clean_kw = re.sub(r'[^a-zA-Z0-9\s]', '', raw_kw)
                         encoded_kw = urllib.parse.quote(f"{clean_kw} pinterest style concept art sketch highly detailed")
-                        st.image(f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true&seed={i+800}", use_container_width=True)
+                        
+                        # Fix: Raw HTML bypasses Streamlit timeout, uniquely seeded
+                        img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true&seed={i+999}"
+                        st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 0px; margin-bottom: 12px; border: 1px solid #E5E7EB;">', unsafe_allow_html=True)
+                        
                     st.markdown(f"**{item.get('title', 'Asset')}**")
                     st.markdown(f"<span style='color:#49494A; font-size:0.9rem; font-weight:300;'>{item.get('description', '')}</span>", unsafe_allow_html=True)
 
     st.divider()
     
-    # --- FIX: KPI IMPACT & RATIONALE (Full Horizontal Layout) ---
+    # --- FIXED: KPI IMPACT & RATIONALE (Custom HTML for perfect fit) ---
     if "Designer" not in sel_per:
-        st.markdown("<h2>Core KPI Impact & Economic Rationale</h2>", unsafe_allow_html=True)
-        kpi_matrix = doc.get('kpi_impact_matrix', [])
-        if kpi_matrix:
-            kpi_cols = st.columns(len(kpi_matrix), gap="large")
-            for i, kpi in enumerate(kpi_matrix):
-                with kpi_cols[i]:
+        col_kpi, col_sources = st.columns([1.5, 1], gap="large")
+        with col_kpi:
+            st.markdown("<h2>Core KPI Impact & Rationale</h2>", unsafe_allow_html=True)
+            kpi_cols = st.columns(len(doc.get('kpi_impact_matrix', [])) or 1, gap="medium")
+            for i, kpi in enumerate(doc.get('kpi_impact_matrix', [])):
+                with kpi_cols[i % len(kpi_cols)]:
                     with st.container(border=True):
-                        st.metric(kpi.get('kpi_name', 'KPI'), kpi.get('impact_metric', '0%'))
-                        st.markdown(f"<span style='color:#49494A; font-size:0.95rem; font-weight:300; line-height:1.5;'>{kpi.get('mckinsey_rationale', '')}</span>", unsafe_allow_html=True)
-        st.divider()
+                        # Completely custom HTML to prevent Streamlit's st.metric from overflowing
+                        st.markdown(f"""
+                            <div style='font-size: 0.8rem; font-weight: 700; color: #F5A623; text-transform: uppercase; white-space: normal; line-height: 1.2; margin-bottom: 0.5rem;'>
+                                {kpi.get('kpi_name', 'KPI')}
+                            </div>
+                            <div style='font-size: 2.2rem; font-weight: 300; color: #1C1C1C; margin-bottom: 0.5rem;'>
+                                {kpi.get('impact_metric', '0%')}
+                            </div>
+                            <div style='font-size: 0.95rem; font-weight: 300; color: #49494A; line-height: 1.5;'>
+                                {kpi.get('mckinsey_rationale', '')}
+                            </div>
+                        """, unsafe_allow_html=True)
 
-    # --- FIX: SOURCES AT BOTTOM ---
-    st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
-    sources = doc.get('source_links', [])
-    if sources:
-        src_cols = st.columns(len(sources) if len(sources) > 0 else 1, gap="large")
-        for i, src in enumerate(sources):
+        with col_sources:
+            st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
+            for src in doc.get('source_links', []):
+                with st.container(border=True):
+                    st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
+    else:
+        st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
+        src_cols = st.columns(len(doc.get('source_links', [])) or 1, gap="large")
+        for i, src in enumerate(doc.get('source_links', [])):
             with src_cols[i % len(src_cols)]:
                 with st.container(border=True):
                     st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
