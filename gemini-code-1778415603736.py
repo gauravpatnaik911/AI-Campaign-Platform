@@ -106,10 +106,11 @@ def generate_proactive_response(ind, sub, per, context: ContextLayer, anomaly_da
     
     action_format = action_formats.get(per, "Must start with 'ALERT: Anomaly detected.' Followed by strategic advice.")
 
+    # FIX: Updated context.json() to context.model_dump_json() for Pydantic V2 support
     sys_prompt = f"""
     You are an autonomous Sense & Respond Agent acting as a {per} in the {sub} ({ind}) sector.
     
-    GOVERNANCE CONTEXT: {context.json()}
+    GOVERNANCE CONTEXT: {context.model_dump_json()}
     LIVE ANOMALY DETECTED: {json.dumps(anomaly_data)}
 
     MANDATE:
@@ -138,7 +139,7 @@ def query_groq(prompt: str, system_context: str, client: Groq):
                 {"role": "system", "content": f"You are a helpful assistant refining the following strategy: {system_context}"},
                 {"role": "user", "content": prompt}
             ],
-            model="llama-3.1-8b-instant", # Faster model for chat interactivity
+            model="llama-3.1-8b-instant",
             temperature=0.5
         )
         return resp.choices[0].message.content
@@ -209,7 +210,8 @@ if st.session_state.auto_intelligence_generated:
         st.markdown("**Simulated Market Anomaly (JSON):**")
         st.json(st.session_state.scraped_data)
         st.markdown("**Active Governance Artifacts Enforced:**")
-        st.code(st.session_state.context_layer.json(indent=2), language="json")
+        # FIX: Updated .json(indent=2) to .model_dump_json(indent=2) for Pydantic V2
+        st.code(st.session_state.context_layer.model_dump_json(indent=2), language="json")
 
     # Render Proactive Alert
     st.info(f"The system has drafted the following proactive response tailored to your specific role.")
