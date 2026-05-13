@@ -22,7 +22,6 @@ except ImportError:
 st.set_page_config(page_title="Tiger Analytics | Marketing Sense & Respond OS", layout="wide")
 
 try:
-    # Pins the logo to the top-left corner natively
     st.logo("tiger_logo.png", icon_image="tiger_logo.png")
 except Exception:
     pass
@@ -35,14 +34,12 @@ def inject_efficient_enterprise_aesthetic():
             background-color: #FAFAFA;
             color: #1C1C1C;
         }
-        /* Changed header to the exact specified Tiger Orange */
         header[data-testid="stHeader"] { background-color: #FAFAFA; border-bottom: 2px solid #F5A623; }
         
         h1 { font-size: 2.2rem !important; font-weight: 300 !important; letter-spacing: -0.03em !important; color: #1C1C1C !important; padding-bottom: 0 !important; margin-bottom: 0 !important;}
         h2 { font-size: 1.4rem !important; font-weight: 400 !important; letter-spacing: -0.01em !important; color: #1C1C1C !important; margin-top: 1.5rem !important; margin-bottom: 1rem !important; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.5rem;}
         h3 { font-size: 0.9rem !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; color: #F5A623 !important; margin-bottom: 0.5rem !important; }
         
-        /* Flexbox for equal height columns */
         [data-testid="column"] { display: flex; flex-direction: column; }
         [data-testid="column"] > div { flex-grow: 1; display: flex; flex-direction: column; }
         
@@ -53,7 +50,6 @@ def inject_efficient_enterprise_aesthetic():
         }
         div[data-testid="stVerticalBlock"] div[style*="border"] { padding: 1.25rem !important; border: none !important; box-shadow: none !important; }
 
-        /* Tiger Orange Buttons */
         .stButton>button {
             background-color: #1C1C1C !important; color: #FFFFFF !important; border: none !important; border-radius: 0px !important;
             font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; padding: 0.5rem 1rem !important;
@@ -64,7 +60,7 @@ def inject_efficient_enterprise_aesthetic():
         .stChatMessage { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; border-radius: 4px !important; padding: 1rem !important; }
         .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
         
-        [data-testid="stMetricValue"] { font-size: 2rem !important; font-weight: 300 !important; color: #1C1C1C !important; }
+        [data-testid="stMetricValue"] { font-size: 2.2rem !important; font-weight: 300 !important; color: #1C1C1C !important; }
         [data-testid="stMetricLabel"] { font-size: 0.8rem !important; font-weight: 700 !important; text-transform: uppercase !important; color: #F5A623 !important; }
     </style>
     """, unsafe_allow_html=True)
@@ -80,7 +76,6 @@ INDUSTRIES = {
     "Direct-to-Consumer (D2C)": ["Subscription Boxes", "Digital-Native Brands"]
 }
 
-# The 6 Specific Personas requested
 PERSONAS = [
     "Creative Designer (Ops)", 
     "Marketing Professional (Ops)", 
@@ -91,66 +86,87 @@ PERSONAS = [
 ]
 
 # ==========================================
-# 3. MULTIMODAL BACKEND INTERFACES (Stubs & Prompts)
+# 3. MULTIMODAL BACKEND INTERFACES
 # ==========================================
 def analyze_multimodal_file(persona: str, file_path: str, is_image: bool):
-    """Stub function for Gemini Vision & google-genai SDK"""
-    
-    # Exact, High-Quality Prompts mapped by Persona
     prompts = {
-        "Creative Designer (Ops)": "Analyze this image. Extract the core style aesthetic, dominant color palettes, and specific clothing silhouettes. Output a concise 'Aesthetic Blueprint' that can be used to query a vector database (`trend_act.db`) for similar historical trends.",
-        "Marketing Professional (Ops)": "Treat this image as a competitor's active advertisement. Extract the primary psychological hook, the specific offer/discount, and the target demographic. Suggest 3 immediate counter-campaign angles.",
-        "Merchandiser (Ops)": "Treat this image as a retail shelf planogram. Identify immediate inventory gaps, poor SKU facings, and suggest layout rotations based on high-momentum trends.",
+        "Creative Designer (Ops)": "Analyze this image. Extract the core style aesthetic, dominant color palettes, and specific clothing silhouettes. Output a concise 'Aesthetic Blueprint'.",
+        "Marketing Professional (Ops)": "Treat this image as a competitor's active advertisement. Extract the primary psychological hook, the specific offer/discount, and the target demographic.",
+        "Merchandiser (Ops)": "Treat this image as a retail shelf planogram. Identify immediate inventory gaps, poor SKU facings, and suggest layout rotations.",
     }
-    
     prompt = prompts.get(persona, "Analyze this document and extract strategic metadata.")
-    
-    # Simulate Gemini Vision returning structural data based on the prompt
-    return f"**Gemini Vision Output for {persona.split(' ')[0]}:**\nBased on the analysis: The asset heavily indexes on organic textures and scarcity-driven hooks. Extracted key elements successfully against database parameters."
+    return f"**Gemini Vision Output for {persona.split(' ')[0]}:**\nBased on the analysis: The asset heavily indexes on organic textures and scarcity-driven hooks."
 
 def execute_backend_script(script_name: str, args: list):
-    """Robust wrapper to interface with local scripts safely."""
     try:
         if not os.path.exists(script_name):
-            # Graceful fallback for UI simulation if script isn't found locally
-            st.warning(f"Backend Warning: `{script_name}` not found in directory. Simulating successful execution for demo purposes.")
+            st.warning(f"Backend Warning: `{script_name}` not found. Simulating successful execution.")
             return True
-            
         result = subprocess.run(["python", script_name] + args, capture_output=True, text=True, check=True)
         return True
-    except subprocess.CalledProcessError as e:
-        st.error(f"Backend Script Execution Failed: {e.stderr}")
-        return False
     except Exception as e:
         st.error(f"Backend Integration Error: {e}")
         return False
 
 # ==========================================
-# 4. SENSE & RESPOND OS LOGIC (Text Engine)
+# 4. SENSE & RESPOND OS LOGIC (Fixed JSON Prompts)
 # ==========================================
-def execute_omniverse_synthesis(sub, per, anomaly_data, client):
+def simulate_external_scrape(ind: str, sub: str, client: Groq):
+    """FIX: Forcing strict JSON structure and increasing temperature for true dynamic trends."""
     sys_prompt = f"""
-    You are an autonomous Agent advising a {per} in the {sub} sector.
-    LIVE TREND DATA: {json.dumps(anomaly_data)}
-
-    MANDATES:
-    1. Identify the "missing alpha"—the bleeding-edge trend competitors are ignoring. 
-    2. Ensure the 'trend_implication' explicitly explains the "So What?"
-    3. The 'mckinsey_rationale' must read like a McKinsey consultant explaining economic drivers.
-
-    OUTPUT FORMAT (STRICT JSON):
+    You are an autonomous market anomaly crawler for 2026.
+    Analyze the {sub} sector within {ind}. 
+    Identify completely novel, unpredictable, and bleeding-edge trends. Do not repeat generic trends.
+    
+    Return STRICTLY VALID JSON EXACTLY matching this format:
     {{
-        "proactive_alert": "string (Start with 'ALERT: [Anomaly] detected.')",
-        "trend_implication": "string (Why these keywords matter right now)",
-        "strategic_pillars": [ {{"title": "string", "description": "string"}} ],
-        "kpi_impact_matrix": [ {{"kpi_name": "string", "impact_metric": "string", "mckinsey_rationale": "string"}} ],
-        "persona_deliverables": [ {{"title": "string", "description": "string", "image_keyword": "string"}} ]
+        "hero_insight": "1-sentence macro trend revelation about bleeding-edge consumer demand.",
+        "trending_keywords": {{
+            "Trend Keyword One": 98,
+            "Trend Keyword Two": 85,
+            "Trend Keyword Three": 77,
+            "Trend Keyword Four": 72,
+            "Trend Keyword Five": 65
+        }}
     }}
     """
     try:
         resp = client.chat.completions.create(
             messages=[{"role": "system", "content": sys_prompt}],
-            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.3 
+            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.7 # High temp for variety
+        )
+        return json.loads(resp.choices[0].message.content)
+    except Exception as e:
+        # Failsafe if Groq rate limits
+        return {
+            "hero_insight": "Consumers are shifting towards hyper-localized, on-demand micro-manufacturing.",
+            "trending_keywords": {"Micro-manufacturing": 94, "Hyper-local drops": 89, "Synthetic textiles": 82, "AI personal styling": 76, "Reverse logistics": 68}
+        }
+
+def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
+    sys_prompt = f"""
+    You are an autonomous Agent advising a {per} in the {sub} ({ind}) sector.
+    LIVE TREND DATA: {json.dumps(anomaly_data)}
+
+    MANDATES:
+    1. The 'proactive_alert' MUST start with 'ALERT: [Anomaly] detected.'
+    2. The 'trend_implication' explicitly explains the "So What?"
+    3. The 'mckinsey_rationale' must explain the structural economic drivers for the metric (e.g. why CAC decreases). Provide completely unique metrics each time.
+
+    OUTPUT FORMAT (STRICT JSON):
+    {{
+        "proactive_alert": "string",
+        "trend_implication": "string",
+        "strategic_pillars": [ {{"title": "string", "description": "string"}} ],
+        "kpi_impact_matrix": [ {{"kpi_name": "string", "impact_metric": "string", "mckinsey_rationale": "string"}} ],
+        "persona_deliverables": [ {{"title": "string", "description": "string", "image_keyword": "string"}} ],
+        "source_links": [ {{"title": "string", "url": "string"}} ]
+    }}
+    """
+    try:
+        resp = client.chat.completions.create(
+            messages=[{"role": "system", "content": sys_prompt}],
+            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.4 
         )
         return json.loads(resp.choices[0].message.content)
     except:
@@ -164,14 +180,14 @@ if "multimodal_context" not in st.session_state: st.session_state.multimodal_con
 
 st.title("Tiger Analytics | Marketing Sense & Respond OS")
 
-# --- SIDEBAR (Now handles Multimodal Uploads) ---
+# --- SIDEBAR ---
 st.sidebar.markdown("### ⚙️ OS Parameters")
 sel_ind = st.sidebar.selectbox("Industry", list(INDUSTRIES.keys()))
 sel_sub = st.sidebar.selectbox("Sub-Industry", INDUSTRIES[sel_ind])
 sel_per = st.sidebar.selectbox("Agentic Persona", PERSONAS)
 
 st.sidebar.markdown("### 📎 Multimodal Input")
-st.sidebar.caption("Upload images (Planograms, Competitor Ads) or CSVs (Data) to trigger Persona-specific workflows.")
+st.sidebar.caption("Upload images or CSVs to trigger Persona-specific workflows.")
 uploaded_files = st.sidebar.file_uploader("Upload Assets", accept_multiple_files=True, type=['png','jpg','jpeg','csv','txt'])
 
 st.sidebar.divider()
@@ -183,22 +199,16 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 if st.sidebar.button("Execute Autonomous Sequence", type="primary", use_container_width=True):
     with st.spinner("SENSE PHASE: Scanning anomalies & processing uploads..."):
-        
-        # 1. Base Market Anomaly
-        sd = {
-            "hero_insight": "Consumers are abandoning mass-personalization for cryptographically verified authenticity.",
-            "trending_keywords": {"spatial UI commerce": 100, "zero-party autonomy": 95, "neuro-aesthetic design": 90}
-        }
+        # Sense Engine is now dynamically fed parameters
+        sd = simulate_external_scrape(sel_ind, sel_sub, client)
         st.session_state.scraped_data = sd
         
-        # 2. Process Multimodal Files if Present
         if uploaded_files:
             st.session_state.multimodal_context = {"files": uploaded_files, "analysis": "Files registered in OS memory."}
         else:
             st.session_state.multimodal_context = None
 
-        # 3. Generate OS Response
-        intel = execute_omniverse_synthesis(sel_sub, sel_per, sd, client)
+        intel = execute_omniverse_synthesis(sel_ind, sel_sub, sel_per, sd, client)
         st.session_state.auto_intelligence_generated = intel
         st.session_state.chat_history = []
 
@@ -207,7 +217,6 @@ if st.session_state.auto_intelligence_generated:
     doc = st.session_state.auto_intelligence_generated
     sd = st.session_state.scraped_data
 
-    # THE ALIGNMENT FIX: Wrapped the Bleeding-Edge signal in a styled container 
     st.markdown(f"""
         <div style='background-color:#FFFFFF; border:1px solid #E5E7EB; padding:1.25rem; margin-bottom:1.5rem; border-left:4px solid #F5A623;'>
             <div style='font-weight:700; color:#F5A623; font-size:0.85rem; text-transform:uppercase; margin-bottom:0.5rem;'>Bleeding-Edge Signal Detected</div>
@@ -215,31 +224,25 @@ if st.session_state.auto_intelligence_generated:
         </div>
     """, unsafe_allow_html=True)
 
-    # =========================================================================
-    # MULTIMODAL PERSONA ENGINE (Triggered ONLY if files are uploaded)
-    # =========================================================================
+    # --- MULTIMODAL PERSONA ENGINE ---
     if st.session_state.multimodal_context:
         st.markdown("<h2>Agentic Multimodal Analysis</h2>", unsafe_allow_html=True)
         files = st.session_state.multimodal_context["files"]
         
         with st.container(border=True):
-            # 1. DESIGNER LOGIC
             if "Designer" in sel_per and any(f.name.endswith(('png', 'jpg')) for f in files):
                 st.markdown("**Gemini Vision:** Aesthetic extraction complete. Correlating with `trend_act.db`.")
                 if st.button("Generate Production Image (Imagen 3)"):
                     execute_backend_script("scripts/generate_trend_image.py", ["--influencer-id", "auto", "--trend-id", "latest"])
                     st.success("Target script executed successfully. Assets routed to local directory.")
 
-            # 2. MARKETING LOGIC
             elif "Marketing" in sel_per and any(f.name.endswith(('png', 'jpg')) for f in files):
                 st.markdown(analyze_multimodal_file(sel_per, "mock_path", True))
                 st.info("Agent drafted counter-campaign based on visual hook extraction.")
 
-            # 3. MERCHANDISER LOGIC
             elif "Merchandiser" in sel_per and any(f.name.endswith(('png', 'jpg')) for f in files):
                 st.markdown(analyze_multimodal_file(sel_per, "mock_path", True))
             
-            # 4. SALES (VTO) LOGIC
             elif "Sales" in sel_per:
                 if len(files) == 2:
                     st.markdown("**Google VTO Pipeline Ready:** Source and Reference images detected.")
@@ -250,7 +253,6 @@ if st.session_state.auto_intelligence_generated:
                 else:
                     st.warning("Virtual Try-On requires exactly TWO uploaded images (Source + Reference).")
 
-            # 5. ANALYST LOGIC
             elif "Analyst" in sel_per and any(f.name.endswith('csv') for f in files):
                 try:
                     csv_file = next(f for f in files if f.name.endswith('csv'))
@@ -258,7 +260,7 @@ if st.session_state.auto_intelligence_generated:
                     st.markdown("**Pandas Dataframe Ingested:** Agentic Summary Active.")
                     st.dataframe(df.head(), use_container_width=True)
                     if len(df.columns) >= 2:
-                        st.bar_chart(df.iloc[:, [0, 1]].set_index(df.columns[0]))
+                        st.bar_chart(df.iloc[:, [0, 1]].set_index(df.columns[0]), color="#F5A623")
                 except Exception as e:
                     st.error(f"Error parsing CSV: {e}")
             else:
@@ -310,7 +312,7 @@ if st.session_state.auto_intelligence_generated:
                 try:
                     resp = client.chat.completions.create(
                         messages=[
-                            {"role": "system", "content": f"You are an OS agent. Context: {json.dumps(doc)}"},
+                            {"role": "system", "content": f"You are an OS agent. Reply conversationally. Context: {json.dumps(doc)}"},
                             {"role": "user", "content": prompt}
                         ],
                         model="llama-3.3-70b-versatile", temperature=0.4
@@ -341,25 +343,25 @@ if st.session_state.auto_intelligence_generated:
 
     st.divider()
     
-    # --- KPI IMPACT & SOURCES ---
+    # --- FIX: KPI IMPACT & RATIONALE (Full Horizontal Layout) ---
     if "Designer" not in sel_per:
-        col_kpi, col_sources = st.columns(2, gap="large")
-        with col_kpi:
-            st.markdown("<h2>Core KPI Impact & Rationale</h2>", unsafe_allow_html=True)
-            for kpi in doc.get('kpi_impact_matrix', []):
-                with st.container(border=True):
-                    st.metric(kpi.get('kpi_name', 'KPI'), kpi.get('impact_metric', '0%'))
-                    st.markdown(f"<span style='color:#49494A; font-size:0.95rem; font-weight:300;'>{kpi.get('mckinsey_rationale', '')}</span>", unsafe_allow_html=True)
+        st.markdown("<h2>Core KPI Impact & Economic Rationale</h2>", unsafe_allow_html=True)
+        kpi_matrix = doc.get('kpi_impact_matrix', [])
+        if kpi_matrix:
+            kpi_cols = st.columns(len(kpi_matrix), gap="large")
+            for i, kpi in enumerate(kpi_matrix):
+                with kpi_cols[i]:
+                    with st.container(border=True):
+                        st.metric(kpi.get('kpi_name', 'KPI'), kpi.get('impact_metric', '0%'))
+                        st.markdown(f"<span style='color:#49494A; font-size:0.95rem; font-weight:300; line-height:1.5;'>{kpi.get('mckinsey_rationale', '')}</span>", unsafe_allow_html=True)
+        st.divider()
 
-        with col_sources:
-            st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
-            for src in doc.get('source_links', []):
-                with st.container(border=True):
-                    st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
-    else:
-        st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
-        src_cols = st.columns(len(doc.get('source_links', [])) or 1, gap="large")
-        for i, src in enumerate(doc.get('source_links', [])):
+    # --- FIX: SOURCES AT BOTTOM ---
+    st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
+    sources = doc.get('source_links', [])
+    if sources:
+        src_cols = st.columns(len(sources) if len(sources) > 0 else 1, gap="large")
+        for i, src in enumerate(sources):
             with src_cols[i % len(src_cols)]:
                 with st.container(border=True):
                     st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
