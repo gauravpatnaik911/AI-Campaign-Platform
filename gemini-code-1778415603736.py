@@ -1,11 +1,9 @@
 import streamlit as st
 import json
-import pandas as pd
-import urllib.parse
 from pydantic import BaseModel
 from typing import List, Dict
 
-# --- CORE LIBRARY CHECK ---
+# --- INSTITUTIONAL LIBRARY CHECK ---
 try:
     from groq import Groq
 except ImportError:
@@ -13,293 +11,239 @@ except ImportError:
     st.stop()
 
 # ==========================================
-# 1. TIGER ANALYTICS ENTERPRISE TAXONOMY
+# STEP 1: DATA ARCHITECTURE & TYPES
+# ==========================================
+class ContextLayer(BaseModel):
+    data_inventory: str
+    data_directory: str
+    data_registry: str
+    data_dictionary: str
+    metadata_repository: str
+
+# ==========================================
+# STEP 2: SCALED ENTERPRISE TAXONOMY
 # ==========================================
 INDUSTRIES = {
     "Retail & Apparel (e.g., Nike, Gap)": ["Athleisure & Footwear", "Fast Fashion", "Luxury Apparel", "Sporting Goods"],
-    "CPG & FMCG (e.g., PepsiCo)": ["Food & Beverage", "Snacks & Confectionery", "Sports & Energy Drinks", "Personal Care"],
-    "Direct-to-Consumer (D2C)": ["Subscription Boxes", "Digital-Native Brands", "Health & Supplements", "Home & Furniture"],
-    "Retail Operations & Tech": ["Omnichannel Fulfillment", "In-Store Experience", "E-commerce Platforms", "Supply Chain Tech"]
+    "CPG & FMCG (e.g., PepsiCo)": ["Food & Beverage", "Snacks & Confectionery", "Personal Care", "Household Goods"],
+    "Direct-to-Consumer (D2C)": ["Subscription Boxes", "Digital-Native Brands", "Health & Supplements"],
+    "Healthcare & Life Sciences": ["Pharmaceuticals", "Medical Devices", "Consumer Health"],
+    "Media & Entertainment": ["Streaming Platforms", "Gaming", "Digital Publishing"]
 }
 
 PERSONAS = [
-    "Creative Designer (Ops)", 
-    "Campaign Analyst (Ops)", 
-    "Merchandising Manager (Ops)", 
+    "Digital Marketer / Campaign App (Ops)",
+    "Creative Designer (Ops)",
+    "Campaign Analyst (Ops)",
+    "Merchandiser / Demand Sensing (Ops)",
     "Data Scientist (Ops)",
     "Digital Product Owner (Ops)",
-    "Chief Marketing Officer (Strategy)", 
-    "VP of Supply Chain & Logistics (Strategy)", 
+    "Brand Manager / War Room (Strategy)",
+    "Chief Marketing Officer (Strategy)",
+    "VP of Supply Chain & Logistics (Strategy)",
     "Chief Revenue Officer (Strategy)"
 ]
 
-# ==========================================
-# 2. SCHEMA DEFINITIONS
-# ==========================================
-class StrategicSignal(BaseModel):
-    feature_name: str
-    virality_score: float      
-    yield_velocity: float      
-    mbb_action_title: str      
-
-class SourceLink(BaseModel):
-    title: str
-    url: str
-
-class OmniverseIntelligence(BaseModel):
-    governing_thought: str
-    strategic_pillars: List[Dict[str, str]]
-    signals: List[StrategicSignal]
-    kpi_impact_matrix: Dict[str, str]
-    linchpin_risk: str
-    persona_deliverables: List[Dict[str, str]]
-    source_links: List[SourceLink]
+def seed_context_layer(ind: str, sub: str, per: str) -> ContextLayer:
+    """Generates mock enterprise governance artifacts based on selections."""
+    prefix = ind.split(' ')[0].lower()
+    return ContextLayer(
+        data_inventory=f"Live_API_Firehose, {sub.replace(' ', '_')}_Historical_DB",
+        data_directory=f"s3://enterprise-data/{prefix}/{sub.lower().replace(' ', '_')}/",
+        data_registry=f"Steward: Data_Ops | Owner: {per}",
+        data_dictionary=f"Metrics strictly tailored to {per} workflows.",
+        metadata_repository="Compliance: SOC2/GDPR | Anomaly_Threshold: High"
+    )
 
 # ==========================================
-# 3. THE LOGIC ENGINES
+# STEP 3: SYNTHETIC SENSE ENGINE
 # ==========================================
-def execute_social_listening(sub_industry: str, client: Groq):
+def simulate_external_scrape(sub_industry: str, client: Groq):
+    """SENSE PHASE: Simulates a real-time market anomaly using strict JSON."""
     sys_prompt = """
-    You are a predictive text-mining crawler for 2026. Return strictly JSON:
-    - 'hero_insight': 1-sentence macro trend revelation about emerging, overlooked consumer demand.
-    - 'viral_velocity_score': integer (0-100).
-    - 'demand_trajectory': string (e.g., 'Hyper-Growth', 'Cooling').
-    - 'trending_keywords': dictionary of 6 bleeding-edge trending phrases and their virality percentage (integer 1-100).
+    You are an autonomous market anomaly detection crawler operating in 2026.
+    Return strictly JSON with the following exact keys:
+    - 'market_anomaly_detected': string (Describe a sudden, highly specific external event, competitor move, supply shock, or viral trend).
+    - 'sentiment_shift': string (Describe how consumer or market sentiment has shifted in the last 24 hours).
     """
     try:
         resp = client.chat.completions.create(
-            messages=[{"role": "system", "content": sys_prompt}, {"role": "user", "content": f"Scan {sub_industry}"}],
-            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}
+            messages=[
+                {"role": "system", "content": sys_prompt}, 
+                {"role": "user", "content": f"Scan real-time market signals for {sub_industry}."}
+            ],
+            model="llama-3.3-70b-versatile", 
+            response_format={"type": "json_object"}
         )
         return json.loads(resp.choices[0].message.content)
-    except:
+    except Exception as e:
         return {
-            "hero_insight": "Consumers are abandoning mass-personalization for hyper-local, cryptographically verified authenticity.", 
-            "viral_velocity_score": 91, "demand_trajectory": "Accelerating",
-            "trending_keywords": {"zero-party autonomy": 95, "biophilic materials": 88, "spatial UI commerce": 100, "decentralized loyalty": 75, "dark-store micro-fulfillment": 80, "neuro-aesthetic design": 90}
+            "market_anomaly_detected": "Major competitor unexpectedly slashed prices by 40% across flagship product lines while launching a massive TikTok takeover.",
+            "sentiment_shift": "Consumers are exhibiting high price-sensitivity and immediate brand switching behaviors."
         }
 
-def execute_omniverse_synthesis(ind, sub, per, social_data, client):
-    persona_directives = {
-        "Creative Designer (Ops)": "Focus ONLY on cutting-edge 2026 visual aesthetics. For 'persona_deliverables', provide 3 'Pinterest-Style Sketch Prompts'. The 'image_keyword' MUST be a highly descriptive 5-7 word prompt for an AI image generator describing a physical sketch.",
-        "Campaign Analyst (Ops)": "Focus ONLY on advanced 2026 ad-tech (e.g., predictive LTV bidding, algorithmic creative fatigue). For 'persona_deliverables', provide 3 'Hyper-Targeted Experiment Hypotheses' with strict control/variant setups.",
-        "Merchandising Manager (Ops)": "Focus ONLY on AI-driven localized assortment and predictive markdown algorithms. For 'persona_deliverables', provide 3 'Algorithmic SKU Interventions'.",
-        "Data Scientist (Ops)": "Focus ONLY on LLM agents, vector databases, and real-time edge computing. For 'persona_deliverables', provide 3 'Machine Learning Architecture Blueprints'.",
-        "Digital Product Owner (Ops)": "Focus ONLY on spatial computing interfaces and biometric checkout. For 'persona_deliverables', provide 3 'Next-Gen Feature Sprint Backlogs'.",
-        "Chief Marketing Officer (Strategy)": "Focus ONLY on overarching brand positioning and cultural disruption. For 'persona_deliverables', provide 3 'Macro Brand Narratives'.",
-        "VP of Supply Chain & Logistics (Strategy)": "Focus ONLY on blockchain traceability and autonomous last-mile robotics. For 'persona_deliverables', provide 3 'Logistics Cost-Reduction Initiatives'.",
-        "Chief Revenue Officer (Strategy)": "Focus ONLY on dynamic pricing elasticity models and B2B API monetization. For 'persona_deliverables', provide 3 'Revenue Stream Expansions'."
+# ==========================================
+# STEP 4: LLM ORCHESTRATION (RESPOND ENGINE)
+# ==========================================
+def generate_proactive_response(ind, sub, per, context: ContextLayer, anomaly_data, client: Groq):
+    """RESPOND PHASE: Generates proactive, persona-specific strategy alerts."""
+    
+    # ---------------------------------------------------------
+    # DYNAMIC AGENTIC ROUTER (10 Personas)
+    # ---------------------------------------------------------
+    action_formats = {
+        "Digital Marketer / Campaign App (Ops)": "Must start with 'ALERT: [Insert Anomaly] detected. Drafted Response Campaign:' Followed by targeted demographic segment, exact email copy, and a TikTok hook.",
+        "Creative Designer (Ops)": "Must start with 'ALERT: [Insert Anomaly] detected. Visual Pivot Required:' Followed by exact design asset updates, color palette shifts, and moodboard direction.",
+        "Campaign Analyst (Ops)": "Must start with 'ALERT: [Insert Anomaly] detected. Budget Reallocation Plan:' Followed by A/B test parameters, CPA impact predictions, and media mix adjustments.",
+        "Merchandiser / Demand Sensing (Ops)": "Must start with 'ALERT: [Insert Anomaly] detected. Inventory Intervention:' Followed by projected stock-to-sales shifts and exact SKU rationalization/allocation advice.",
+        "Data Scientist (Ops)": "Must start with 'ALERT: [Insert Anomaly] detected. Model Drift Warning:' Followed by required algorithm recalibrations, synthetic data generation needs, or pipeline adjustments.",
+        "Digital Product Owner (Ops)": "Must start with 'ALERT: [Insert Anomaly] detected. Feature Sprint Adjustment:' Followed by UI/UX backlog prioritization and checkout funnel optimizations.",
+        "Brand Manager / War Room (Strategy)": "Must start with 'ALERT: Competitor/Market move detected. Strategic Counter-Positioning:' Followed by brand voice guidelines and rapid differentiation tactics.",
+        "Chief Marketing Officer (Strategy)": "Must start with 'ALERT: Macro Anomaly detected. Board-Level Marketing Pivot:' Followed by overarching positioning, market share defense, and high-level budget reallocation.",
+        "VP of Supply Chain & Logistics (Strategy)": "Must start with 'ALERT: Supply/Demand Shock detected. Logistics Countermeasure:' Followed by freight, warehousing, supplier diversification, and fulfillment routing changes.",
+        "Chief Revenue Officer (Strategy)": "Must start with 'ALERT: Revenue Threat/Opportunity detected. Monetization Pivot:' Followed by pricing elasticity adjustments, B2B/B2C channel shifts, and margin defense."
     }
     
-    directive = persona_directives.get(per, "Provide actionable insights relevant to the persona.")
+    action_format = action_formats.get(per, "Must start with 'ALERT: Anomaly detected.' Followed by strategic advice.")
 
     sys_prompt = f"""
-    You are an elite Strategy Partner advising a {per} at an enterprise like Nike or PepsiCo in the {sub} ({ind}) sector.
-    LIVE VIRAL MACRO-TREND DATA: {json.dumps(social_data)}
+    You are an autonomous Sense & Respond Agent acting as a {per} in the {sub} ({ind}) sector.
+    
+    GOVERNANCE CONTEXT: {context.json()}
+    LIVE ANOMALY DETECTED: {json.dumps(anomaly_data)}
 
-    CRITICAL DIRECTIVE: {directive}
-    MANDATORY TONE: Your advice must justify a $100k consulting fee. Identify the "missing alpha"—the absolute bleeding-edge trend that competitors are currently ignoring. Do NOT use generic business fluff. Give them something highly technical and eye-catching.
-
-    OUTPUT FORMAT (STRICT JSON EXACTLY AS SHOWN BELOW):
-    {{
-        "governing_thought": "string (Board-level summary of the missing alpha)",
-        "strategic_pillars": [
-            {{"title": "string", "description": "string (Exact execution instructions)"}},
-            {{"title": "string", "description": "string"}},
-            {{"title": "string", "description": "string"}}
-        ],
-        "signals": [
-            {{"feature_name": "string", "virality_score": 90.5, "yield_velocity": 2.4, "mbb_action_title": "string"}}
-        ],
-        "kpi_impact_matrix": {{"KPI 1": "Impact", "KPI 2": "Impact", "KPI 3": "Impact"}},
-        "linchpin_risk": "string",
-        "persona_deliverables": [
-            {{"title": "string", "description": "string", "image_keyword": "string"}} 
-        ],
-        "source_links": [
-            {{"title": "string (e.g., Gartner, Business of Fashion, McKinsey)", "url": "string (Valid or highly realistic URL pointing to trend data)"}}
-        ]
-    }}
+    MANDATE:
+    You must draft an immediate, proactive response to the anomaly tailored EXACTLY to the {per}'s daily KPIs.
+    
+    CRITICAL FORMATTING RULE: 
+    {action_format}
+    
+    Do not include conversational filler. Be highly technical, precise, and ready for executive review. Use markdown for readability.
     """
     try:
         resp = client.chat.completions.create(
             messages=[{"role": "system", "content": sys_prompt}],
-            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.3 
+            model="llama-3.3-70b-versatile", 
+            temperature=0.3 
         )
-        return json.loads(resp.choices[0].message.content)
+        return resp.choices[0].message.content
     except Exception as e:
-        st.error(f"Logic Engine Disruption: {e}")
-        return None
+        return f"Error generating proactive response: {e}"
+
+def query_groq(prompt: str, system_context: str, client: Groq):
+    """Handles Human-in-the-Loop chat queries."""
+    try:
+        resp = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": f"You are a helpful assistant refining the following strategy: {system_context}"},
+                {"role": "user", "content": prompt}
+            ],
+            model="llama-3.1-8b-instant", # Faster model for chat interactivity
+            temperature=0.5
+        )
+        return resp.choices[0].message.content
+    except Exception as e:
+        return f"Chat error: {e}"
 
 # ==========================================
-# 4. NATIVE, CLEAN UI DASHBOARD
+# STEP 5: STREAMLIT FRONTEND
 # ==========================================
-st.set_page_config(page_title="Enterprise Intelligence", layout="wide")
+st.set_page_config(page_title="Sense & Respond OS", layout="wide")
 
+# Minimalist Native UI CSS
 st.markdown("""
     <style>
         .block-container { padding-top: 2rem; padding-bottom: 2rem; }
-        h1 { font-weight: 800; color: #0f172a;}
-        h2, h3 { font-weight: 700; color: #1e293b;}
+        h1, h2, h3 { font-weight: 800; color: #0f172a;}
+        .stAlert { border-left: 5px solid #3b82f6 !important; }
     </style>
 """, unsafe_allow_html=True)
 
+# --- STATE MANAGEMENT ---
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+if "scraped_data" not in st.session_state:
+    st.session_state.scraped_data = None
+if "auto_intelligence_generated" not in st.session_state:
+    st.session_state.auto_intelligence_generated = None
+if "context_layer" not in st.session_state:
+    st.session_state.context_layer = None
+
 # --- SIDEBAR CONTROLS ---
-st.sidebar.title("Strategic Parameters")
-sel_ind = st.sidebar.selectbox("Enterprise Industry", list(INDUSTRIES.keys()))
+st.sidebar.title("⚡ Marketing OS")
+sel_ind = st.sidebar.selectbox("Industry Ecosystem", list(INDUSTRIES.keys()))
 sel_sub = st.sidebar.selectbox("Sub-Industry Segment", INDUSTRIES[sel_ind])
-sel_per = st.sidebar.selectbox("Executive Persona", PERSONAS)
+sel_per = st.sidebar.selectbox("Autonomous Agent Persona", PERSONAS)
 
 st.sidebar.divider()
 
 if "GROQ_API_KEY" not in st.secrets:
-    st.sidebar.error("GROQ_API_KEY missing in Secrets.")
+    st.sidebar.error("GROQ_API_KEY missing in `.streamlit/secrets.toml`.")
     st.stop()
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
-if st.sidebar.button(f"Generate Strategy for {sel_per.split(' ')[0]}", type="primary", use_container_width=True):
-    with st.spinner(f"Aggregating Missing Alpha & Tailoring for {sel_per.split(' ')[0]}..."):
-        social_data = execute_social_listening(sel_sub, client)
-        intel = execute_omniverse_synthesis(sel_ind, sel_sub, sel_per, social_data, client)
+if st.sidebar.button("Run Sense & Respond Sequence", type="primary", use_container_width=True):
+    with st.spinner("SENSE PHASE: Scanning global firehose for market anomalies..."):
+        # 1. Seed Governance
+        ctx = seed_context_layer(sel_ind, sel_sub, sel_per)
+        st.session_state.context_layer = ctx
         
-        if intel: 
-            st.session_state.social_data = social_data
-            st.session_state.intel = intel
-
-# --- DASHBOARD RENDERING ---
-if "intel" in st.session_state:
-    doc = st.session_state.intel
-    sd = st.session_state.social_data
-
-    # 1. HERO HEADER
-    st.markdown(f"##### ENTERPRISE BRIEFING FOR: **{sel_per.upper()}**")
-    st.header(doc.get('governing_thought', 'Strategic Overview'))
-    st.info(f"**Bleeding-Edge Signal:** {sd.get('hero_insight', '')}")
-    
-    st.divider()
-
-    # 2. KEYWORDS & METRICS ROW
-    col_keywords, col_metrics = st.columns([1.2, 1])
-    
-    with col_keywords:
-        st.subheader("Trending Market Signals")
-        st.caption("Real-time virality percentages based on social listening.")
-        keywords = sd.get("trending_keywords", {})
-        if keywords:
-            for kw, score in keywords.items():
-                safe_score = min(max(int(score), 0), 100)
-                st.markdown(f"**{kw.title()}**")
-                st.progress(safe_score / 100.0, text=f"{safe_score}% Viral Saturation")
-        else:
-            st.warning("No keyword data currently available.")
-
-    with col_metrics:
-        st.subheader("Velocity & Risk")
-        c1, c2 = st.columns(2)
-        c1.metric("Viral Velocity Index", f"{sd.get('viral_velocity_score', 0)} / 100")
-        c2.metric("Demand Trajectory", sd.get("demand_trajectory", "Active"))
+        # 2. Sense Engine
+        anomaly = simulate_external_scrape(sel_sub, client)
+        st.session_state.scraped_data = anomaly
         
-        st.error(f"**Persona-Specific Linchpin Risk:**\n{doc.get('linchpin_risk', 'N/A')}")
+    with st.spinner(f"RESPOND PHASE: Drafting proactive intelligence for {sel_per.split(' ')[0]}..."):
+        # 3. Respond Engine
+        alert = generate_proactive_response(sel_ind, sel_sub, sel_per, ctx, anomaly, client)
+        st.session_state.auto_intelligence_generated = alert
         
-    st.divider()
+        # Clear chat history on new run
+        st.session_state.chat_history = []
 
-    # 3. MECE PILLARS
-    st.subheader(f"Actionable 'Missing Alpha' Strategy")
-    pillars = doc.get('strategic_pillars', [])
-    if pillars and len(pillars) > 0:
-        cols = st.columns(len(pillars))
-        for i, pillar in enumerate(pillars):
-            with cols[i]:
-                title = pillar.get('title', f'Pillar {i+1}')
-                desc = pillar.get('description', '')
-                with st.container(border=True):
-                    st.markdown(f"#### 0{i+1}")
-                    st.markdown(f"**{title}**")
-                    st.markdown(f"<span style='color:#475569'>{desc}</span>", unsafe_allow_html=True)
-
-    st.divider()
-
-    # 4. EXCLUSIVE PERSONA DELIVERABLES (PINTEREST GENERATOR)
-    st.subheader(f"Exclusive Deliverables: {sel_per.split(' ')[0]}")
-    deliverables = doc.get('persona_deliverables', [])
+# --- MAIN DASHBOARD RENDERING ---
+if st.session_state.auto_intelligence_generated:
+    st.markdown(f"### Autonomous Intelligence: {sel_per.split('(')[0]}")
     
-    if deliverables and len(deliverables) > 0:
-        del_cols = st.columns(len(deliverables))
-        for i, item in enumerate(deliverables):
-            with del_cols[i]:
-                d_title = item.get('title', 'Deliverable')
-                d_desc = item.get('description', 'Details pending.')
-                
-                with st.container(border=True):
-                    # IF DESIGNER: Generate a LIVE Pinterest-style sketch!
-                    if "Designer" in sel_per:
-                        raw_kw = item.get('image_keyword', 'fashion design sketch')
-                        # Force the AI generator to make it a Pinterest-style sketch
-                        encoded_kw = urllib.parse.quote(f"{raw_kw} pinterest style concept art sketch highly detailed clean white background")
-                        
-                        # Call the free Pollinations AI Generative Endpoint
-                        st.image(f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true", use_container_width=True)
-                        st.markdown(f"**Visual Concept: {d_title}**")
-                    else:
-                        st.markdown(f"**Tactical Asset: {d_title}**")
-                    
-                    st.markdown(f"<span style='color:#475569'>{d_desc}</span>", unsafe_allow_html=True)
-    else:
-        st.info(f"No specific tactical deliverables generated for {sel_per}.")
+    # Render Simulated Anomaly in an Expander
+    with st.expander("📡 View Raw Sense Engine Data & Governance Artifacts", expanded=False):
+        st.markdown("**Simulated Market Anomaly (JSON):**")
+        st.json(st.session_state.scraped_data)
+        st.markdown("**Active Governance Artifacts Enforced:**")
+        st.code(st.session_state.context_layer.json(indent=2), language="json")
+
+    # Render Proactive Alert
+    st.info(f"The system has drafted the following proactive response tailored to your specific role.")
+    with st.container(border=True):
+        st.markdown(st.session_state.auto_intelligence_generated)
 
     st.divider()
 
-    # 5. ARBITRAGE MATRIX
-    st.subheader("Initiative Prioritization & Arbitrage")
-    signals = doc.get('signals', [])
-    if signals:
-        try:
-            sig_df = pd.DataFrame(signals)
-            sig_df['Arbitrage Index'] = (sig_df['virality_score'] * sig_df['yield_velocity']).round(2)
-            sig_df = sig_df.sort_values(by='Arbitrage Index', ascending=False)
+    # --- HUMAN-IN-THE-LOOP CHAT ---
+    st.markdown("### 💬 Human-in-the-Loop Refinement")
+    st.caption("Chat with the OS to refine parameters, adjust tone, or approve the drafted strategy.")
+    
+    # Display History
+    for msg in st.session_state.chat_history:
+        with st.chat_message(msg["role"]): 
+            st.markdown(msg["content"])
             
-            sig_df = sig_df.rename(columns={
-                "feature_name": "Initiative",
-                "mbb_action_title": "Execution Directive",
-                "virality_score": "Virality Score",
-                "yield_velocity": "Yield Velocity"
-            })
+    # Chat Input
+    if prompt := st.chat_input("E.g., 'Make the tone more aggressive' or 'Approve and deploy to dashboard'"):
+        # Append User Input
+        st.session_state.chat_history.append({"role": "user", "content": prompt})
+        with st.chat_message("user"): 
+            st.markdown(prompt)
             
-            st.dataframe(
-                sig_df, use_container_width=True, hide_index=True,
-                column_config={
-                    "Virality Score": st.column_config.ProgressColumn("Virality Score", min_value=0, max_value=100, format="%f"),
-                    "Yield Velocity": st.column_config.NumberColumn("Yield Velocity", format="%.2fx")
-                }
-            )
-        except Exception:
-            st.warning("Matrix rendering issue.")
-    
-    st.divider()
-    
-    # 6. KPI ATTRIBUTION & SOURCE CITATIONS
-    col_kpi, col_sources = st.columns(2)
-    
-    with col_kpi:
-        st.subheader("Core KPI Impact")
-        kpi_matrix = doc.get('kpi_impact_matrix', {})
-        if kpi_matrix and len(kpi_matrix) > 0:
-            for k, v in kpi_matrix.items():
-                with st.container(border=True):
-                    st.markdown(f"**{k}**")
-                    st.caption(v)
-        else:
-            st.info("No KPI metrics generated.")
-
-    with col_sources:
-        st.subheader("Epistemic Origins & Sources")
-        st.caption("Data lineage supporting these missing alpha trends.")
-        sources = doc.get('source_links', [])
-        if sources:
-            for src in sources:
-                title = src.get('title', 'Industry Report')
-                url = src.get('url', '#')
-                with st.container(border=True):
-                    st.markdown(f"🔗 [{title}]({url})")
-        else:
-            st.info("No external source links provided.")
+        # Get AI Response
+        with st.chat_message("assistant"):
+            with st.spinner("Refining operational parameters..."):
+                response = query_groq(
+                    prompt=prompt, 
+                    system_context=st.session_state.auto_intelligence_generated, 
+                    client=client
+                )
+                st.markdown(response)
+                st.session_state.chat_history.append({"role": "assistant", "content": response})
+else:
+    st.markdown("### Welcome to the Sense & Respond OS")
+    st.write("👈 Configure your industry parameters on the left and click **Run Sense & Respond Sequence** to detect anomalies and trigger an autonomous agent.")
