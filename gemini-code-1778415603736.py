@@ -119,7 +119,7 @@ class OmniverseIntelligence(BaseModel):
     trend_implication: str
     strategic_pillars: List[Dict[str, str]]
     signals: List[StrategicSignal]
-    kpi_impact_matrix: List[KPIImpact] # Upgraded for explicit rationale
+    kpi_impact_matrix: List[KPIImpact] 
     persona_deliverables: List[Dict[str, str]]
     source_links: List[SourceLink]
 
@@ -339,7 +339,7 @@ if st.session_state.auto_intelligence_generated:
 
     st.divider()
 
-    # 6. ARBITRAGE MATRIX & GRAPH VISUALIZATION
+    # 6. FUNCTIONAL ARBITRAGE MATRIX
     st.markdown("<h2>Functional Arbitrage & Prioritization</h2>", unsafe_allow_html=True)
     st.markdown("<p style='font-weight: 300; margin-bottom: 1.5rem;'>The <strong>Arbitrage Index</strong> mathematically prioritizes initiatives that offer the highest virality relative to execution yield, optimizing budget allocation.</p>", unsafe_allow_html=True)
     
@@ -349,10 +349,6 @@ if st.session_state.auto_intelligence_generated:
             sig_df = pd.DataFrame(signals)
             sig_df['Arbitrage Index'] = (sig_df['virality_score'] * sig_df['yield_velocity']).round(2)
             sig_df = sig_df.sort_values(by='Arbitrage Index', ascending=False)
-            
-            # Create a clean native graph above the table
-            chart_df = sig_df[['feature_name', 'Arbitrage Index']].set_index('feature_name')
-            st.bar_chart(chart_df, color="#F7901D", height=250)
             
             sig_df = sig_df.rename(columns={"feature_name": "Initiative", "mbb_action_title": "Execution Directive", "virality_score": "Virality Score", "yield_velocity": "Yield Velocity"})
             st.dataframe(sig_df, use_container_width=True, hide_index=True)
@@ -374,7 +370,6 @@ if st.session_state.auto_intelligence_generated:
                         st.metric(kpi.get('kpi_name', 'KPI'), kpi.get('impact_metric', '0%'))
                         st.markdown(f"<span style='color:#49494A; font-size:0.95rem; font-weight:300; line-height:1.5;'>{kpi.get('mckinsey_rationale', '')}</span>", unsafe_allow_html=True)
         else:
-             # Empty placeholder to keep the grid balanced if Designer is selected
              st.markdown("")
 
     with col_sources:
