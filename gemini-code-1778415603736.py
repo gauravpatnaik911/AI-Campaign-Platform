@@ -13,7 +13,7 @@ except ImportError:
     st.stop()
 
 # ==========================================
-# 1. TIGER ANALYTICS x SPACE EFFICIENT UI
+# 1. TIGER ANALYTICS UI SETTINGS
 # ==========================================
 st.set_page_config(page_title="Tiger Analytics | Sense & Respond OS", layout="wide")
 
@@ -25,60 +25,42 @@ except Exception:
 def inject_efficient_enterprise_aesthetic():
     st.markdown("""
     <style>
-        /* Base Editorial Reset */
         html, body, [class*="css"] {
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             background-color: #FAFAFA;
             color: #1C1C1C;
         }
-
-        header[data-testid="stHeader"] {
-            background-color: #FAFAFA;
-            border-bottom: 2px solid #F7901D; /* Tiger Orange */
-        }
-
-        /* Lightweight Typography, Space Efficient */
+        header[data-testid="stHeader"] { background-color: #FAFAFA; border-bottom: 2px solid #F7901D; }
         h1 { font-size: 2.2rem !important; font-weight: 300 !important; letter-spacing: -0.03em !important; color: #1C1C1C !important; padding-bottom: 0 !important; margin-bottom: 0 !important;}
         h2 { font-size: 1.4rem !important; font-weight: 400 !important; letter-spacing: -0.01em !important; color: #1C1C1C !important; margin-top: 1.5rem !important; margin-bottom: 1rem !important; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.5rem;}
         h3 { font-size: 0.9rem !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; color: #F7901D !important; margin-bottom: 0.5rem !important; }
         
-        /* Sharp, White Containers */
         div[data-testid="stVerticalBlock"] div[style*="border"] {
-            border: 1px solid #E5E7EB !important;
-            border-radius: 0px !important; 
-            background-color: #FFFFFF !important;
-            padding: 1.25rem !important; 
+            border: 1px solid #E5E7EB !important; border-radius: 0px !important; 
+            background-color: #FFFFFF !important; padding: 1.25rem !important; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
         }
 
-        /* Sharp Buttons */
         .stButton>button {
             background-color: #1C1C1C !important; color: #FFFFFF !important; border: none !important; border-radius: 0px !important;
             font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; padding: 0.5rem 1rem !important;
         }
         .stButton>button:hover { background-color: #F7901D !important; color: #1C1C1C !important; }
-
-        /* Progress Bars */
         .stProgress > div > div > div > div { background-color: #F7901D !important; height: 6px !important; }
-
-        /* Chat Messages Styling to Pop */
-        .stChatMessage {
-            background-color: #FFFFFF !important;
-            border: 1px solid #E5E7EB !important;
-            border-radius: 4px !important;
-            padding: 1rem !important;
-        }
-
-        /* Space Efficiency */
+        .stChatMessage { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; border-radius: 4px !important; padding: 1rem !important; }
         .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
         .stDataFrame { border-radius: 0px !important; border: 1px solid #E5E7EB !important; }
+        
+        /* Metric Styling for McKinsey KPIs */
+        [data-testid="stMetricValue"] { font-size: 2rem !important; font-weight: 300 !important; color: #1C1C1C !important; }
+        [data-testid="stMetricLabel"] { font-size: 0.8rem !important; font-weight: 700 !important; text-transform: uppercase !important; color: #F7901D !important; }
     </style>
     """, unsafe_allow_html=True)
 
 inject_efficient_enterprise_aesthetic()
 
 # ==========================================
-# 2. DATA ARCHITECTURE & TAXONOMY
+# 2. DATA ARCHITECTURE & TAXONOMY (Refined to 5)
 # ==========================================
 class ContextLayer(BaseModel):
     data_inventory: str
@@ -105,15 +87,44 @@ INDUSTRIES = {
     "Media & Entertainment": ["Streaming Platforms", "Gaming", "Digital Publishing"]
 }
 
+# Strictly 5 Personas (3 Ops, 2 Strategy)
 PERSONAS = [
-    "Digital Marketer / Campaign App (Ops)", "Creative Designer (Ops)", "Campaign Analyst (Ops)",
-    "Merchandiser / Demand Sensing (Ops)", "Data Scientist (Ops)", "Digital Product Owner (Ops)",
-    "Brand Manager / War Room (Strategy)", "Chief Marketing Officer (Strategy)",
-    "VP of Supply Chain & Logistics (Strategy)", "Chief Revenue Officer (Strategy)"
+    "Creative Designer (Ops)", 
+    "Campaign Analyst (Ops)", 
+    "Merchandiser / Demand Sensing (Ops)", 
+    "Chief Marketing Officer (Strategy)", 
+    "VP of Supply Chain & Logistics (Strategy)"
 ]
 
 # ==========================================
-# 3. THE LOGIC ENGINES
+# 3. SCHEMA DEFINITIONS (McKinsey Style Upgrades)
+# ==========================================
+class StrategicSignal(BaseModel):
+    feature_name: str
+    virality_score: float      
+    yield_velocity: float      
+    mbb_action_title: str      
+
+class SourceLink(BaseModel):
+    title: str
+    url: str
+
+class KPIImpact(BaseModel):
+    kpi_name: str
+    impact_metric: str
+    mckinsey_rationale: str
+
+class OmniverseIntelligence(BaseModel):
+    proactive_alert: str 
+    trend_implication: str
+    strategic_pillars: List[Dict[str, str]]
+    signals: List[StrategicSignal]
+    kpi_impact_matrix: List[KPIImpact] # Upgraded for explicit rationale
+    persona_deliverables: List[Dict[str, str]]
+    source_links: List[SourceLink]
+
+# ==========================================
+# 4. THE LOGIC ENGINES
 # ==========================================
 def simulate_external_scrape(sub_industry: str, client: Groq):
     sys_prompt = """
@@ -136,14 +147,14 @@ def simulate_external_scrape(sub_industry: str, client: Groq):
 
 def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_data, client: Groq):
     
-    # Strictly tie deliverables to the strategy pillars so they are functional and not random
     deliverable_formats = {
         "Creative Designer (Ops)": "For 'persona_deliverables', provide 3 'Pinterest-Style Sketch Prompts' that directly execute your pillars. The 'image_keyword' MUST be a highly descriptive 5-7 word prompt for an AI image generator describing a physical sketch.",
-        "Digital Marketer / Campaign App (Ops)": "For 'persona_deliverables', provide 3 specific 'Ad Creative Hooks' that directly execute your pillars.",
         "Campaign Analyst (Ops)": "For 'persona_deliverables', provide 3 'Hyper-Targeted Experiment Hypotheses' that directly execute your pillars.",
         "Merchandiser / Demand Sensing (Ops)": "For 'persona_deliverables', provide 3 'Algorithmic SKU Interventions' that directly execute your pillars.",
+        "Chief Marketing Officer (Strategy)": "For 'persona_deliverables', provide 3 'Macro Brand Repositioning Briefs' that directly execute your pillars.",
+        "VP of Supply Chain & Logistics (Strategy)": "For 'persona_deliverables', provide 3 'Logistics Resiliency Blueprints' that directly execute your pillars."
     }
-    deliv_format = deliverable_formats.get(per, "For 'persona_deliverables', provide 3 highly functional, non-random tactical assets that directly execute the 3 strategic pillars above. They must be exact files, mockups, or documents this persona would actually create.")
+    deliv_format = deliverable_formats.get(per, "Provide 3 highly functional tactical assets.")
 
     sys_prompt = f"""
     You are an autonomous Agent advising a {per} at an enterprise like Nike or PepsiCo in the {sub} ({ind}) sector.
@@ -154,10 +165,12 @@ def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_da
     MANDATES:
     1. Identify the "missing alpha"—the absolute bleeding-edge trend competitors are ignoring. 
     2. {deliv_format}
-    3. Ensure the 'trend_implication' explicitly explains the "So What?"—why these specific virality keywords matter right now to the business bottom line.
+    3. The 'trend_implication' explicitly explains the "So What?"—why these specific virality keywords matter right now to the business bottom line.
+    4. For the 'kpi_impact_matrix', the 'mckinsey_rationale' must read like a McKinsey consultant explaining the structural economic drivers behind the metric change. Do not just say "sales go up". Explain the lever.
 
     OUTPUT FORMAT (STRICT JSON EXACTLY AS SHOWN BELOW):
     {{
+        "proactive_alert": "string (Start with 'ALERT: [Anomaly] detected.')",
         "trend_implication": "string (Detailed explanation of why these keywords are trending and the immediate business implication)",
         "strategic_pillars": [
             {{"title": "string", "description": "string (Exact execution instructions)"}},
@@ -167,7 +180,9 @@ def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_da
         "signals": [
             {{"feature_name": "string (Name of initiative)", "virality_score": 90.5, "yield_velocity": 2.4, "mbb_action_title": "string (Why do this?)"}}
         ],
-        "kpi_impact_matrix": {{"KPI 1": "Impact", "KPI 2": "Impact", "KPI 3": "Impact"}},
+        "kpi_impact_matrix": [
+            {{"kpi_name": "string (e.g., CAC, Margin)", "impact_metric": "string (e.g., -15%)", "mckinsey_rationale": "string (McKinsey-style economic rationale)"}}
+        ],
         "persona_deliverables": [
             {{"title": "string", "description": "string", "image_keyword": "string"}} 
         ],
@@ -200,7 +215,7 @@ def query_groq(prompt: str, system_context: str, client: Groq):
         return f"Chat error: {e}"
 
 # ==========================================
-# 4. STREAMLIT APP RENDERING
+# 5. STREAMLIT APP RENDERING
 # ==========================================
 if "chat_history" not in st.session_state: st.session_state.chat_history = []
 if "scraped_data" not in st.session_state: st.session_state.scraped_data = None
@@ -254,7 +269,6 @@ if st.session_state.auto_intelligence_generated:
             if keywords:
                 for kw, score in keywords.items():
                     safe_score = min(max(int(score), 0), 100)
-                    # Percentage added explicitly here, floated right
                     st.markdown(f"<div style='margin-bottom:-10px; font-weight:600; font-size:0.85rem;'>{kw.title()} <span style='float:right; color:#F7901D;'>{safe_score}%</span></div>", unsafe_allow_html=True)
                     st.progress(safe_score / 100.0)
             else:
@@ -276,9 +290,7 @@ if st.session_state.auto_intelligence_generated:
                     st.markdown(f"### 0{i+1} : {pillar.get('title', '').upper()}")
                     st.markdown(f"<span style='color:#49494A; font-size:0.95rem; font-weight:300;'>{pillar.get('description', '')}</span>", unsafe_allow_html=True)
 
-    # =========================================================================
-    # 4. CHAT BOX - MOVED UP AND HIGHLIGHTED WITH COLOR
-    # =========================================================================
+    # 4. CHAT BOX
     st.markdown("""
         <div style="background-color: #FFF9F2; border-left: 4px solid #F7901D; padding: 1.5rem; margin-top: 3rem; margin-bottom: 1rem;">
             <h2 style="margin-top: 0 !important; border: none !important;">💬 Human-in-the-Loop Refinement</h2>
@@ -327,9 +339,9 @@ if st.session_state.auto_intelligence_generated:
 
     st.divider()
 
-    # 6. FUNCTIONAL ARBITRAGE MATRIX
-    st.markdown("<h2>Functional Arbitrage & Initiative Prioritization</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='font-weight: 300; margin-bottom: 1.5rem;'>Sort by the <strong>Arbitrage Index</strong> to mathematically prioritize the initiatives that offer the highest virality relative to their execution yield. This ensures budget is allocated to maximum-impact signals.</p>", unsafe_allow_html=True)
+    # 6. ARBITRAGE MATRIX & GRAPH VISUALIZATION
+    st.markdown("<h2>Functional Arbitrage & Prioritization</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='font-weight: 300; margin-bottom: 1.5rem;'>The <strong>Arbitrage Index</strong> mathematically prioritizes initiatives that offer the highest virality relative to execution yield, optimizing budget allocation.</p>", unsafe_allow_html=True)
     
     signals = doc.get('signals', [])
     if signals:
@@ -337,24 +349,34 @@ if st.session_state.auto_intelligence_generated:
             sig_df = pd.DataFrame(signals)
             sig_df['Arbitrage Index'] = (sig_df['virality_score'] * sig_df['yield_velocity']).round(2)
             sig_df = sig_df.sort_values(by='Arbitrage Index', ascending=False)
-            sig_df = sig_df.rename(columns={"feature_name": "Initiative", "mbb_action_title": "Execution Directive / So What?", "virality_score": "Virality Score", "yield_velocity": "Yield Velocity"})
+            
+            # Create a clean native graph above the table
+            chart_df = sig_df[['feature_name', 'Arbitrage Index']].set_index('feature_name')
+            st.bar_chart(chart_df, color="#F7901D", height=250)
+            
+            sig_df = sig_df.rename(columns={"feature_name": "Initiative", "mbb_action_title": "Execution Directive", "virality_score": "Virality Score", "yield_velocity": "Yield Velocity"})
             st.dataframe(sig_df, use_container_width=True, hide_index=True)
-        except Exception:
+        except Exception as e:
             st.warning("Matrix rendering issue.")
             
     st.divider()
     
-    # 7. KPI & SOURCES
+    # 7. KPI IMPACT (Dynamically hides for Creative Designer) & SOURCES
     col_kpi, col_sources = st.columns(2)
+    
     with col_kpi:
-        st.markdown("<h2>Core KPI Impact</h2>", unsafe_allow_html=True)
-        kpi_matrix = doc.get('kpi_impact_matrix', {})
-        if kpi_matrix:
-            for k, v in kpi_matrix.items():
-                with st.container(border=True):
-                    st.markdown(f"**{k}**")
-                    st.markdown(f"<span style='color:#49494A; font-weight:300;'>{v}</span>", unsafe_allow_html=True)
-                    
+        if "Designer" not in sel_per:
+            st.markdown("<h2>Core KPI Impact & Rationale</h2>", unsafe_allow_html=True)
+            kpi_matrix = doc.get('kpi_impact_matrix', [])
+            if kpi_matrix:
+                for kpi in kpi_matrix:
+                    with st.container(border=True):
+                        st.metric(kpi.get('kpi_name', 'KPI'), kpi.get('impact_metric', '0%'))
+                        st.markdown(f"<span style='color:#49494A; font-size:0.95rem; font-weight:300; line-height:1.5;'>{kpi.get('mckinsey_rationale', '')}</span>", unsafe_allow_html=True)
+        else:
+             # Empty placeholder to keep the grid balanced if Designer is selected
+             st.markdown("")
+
     with col_sources:
         st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
         sources = doc.get('source_links', [])
