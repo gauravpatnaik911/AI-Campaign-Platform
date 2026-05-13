@@ -57,7 +57,7 @@ PERSONAS = [
 ]
 
 # ==========================================
-# 3. SCHEMA DEFINITIONS (The Complete Merger)
+# 3. SCHEMA DEFINITIONS 
 # ==========================================
 class StrategicSignal(BaseModel):
     feature_name: str
@@ -70,7 +70,7 @@ class SourceLink(BaseModel):
     url: str
 
 class OmniverseIntelligence(BaseModel):
-    proactive_alert: str # The required "ALERT: ..." string
+    proactive_alert: str 
     strategic_pillars: List[Dict[str, str]]
     signals: List[StrategicSignal]
     kpi_impact_matrix: Dict[str, str]
@@ -106,7 +106,6 @@ def simulate_external_scrape(sub_industry: str, client: Groq):
 def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_data, client: Groq):
     """RESPOND PHASE: The fully merged $100k Consulting + Pinterest + Alert Engine."""
     
-    # The Alert Formatting
     action_formats = {
         "Digital Marketer / Campaign App (Ops)": "Start 'proactive_alert' with 'ALERT: [Anomaly] detected. Drafted Response Campaign:'",
         "Creative Designer (Ops)": "Start 'proactive_alert' with 'ALERT: [Anomaly] detected. Visual Pivot Required:'",
@@ -116,7 +115,6 @@ def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_da
     }
     alert_format = action_formats.get(per, "Start 'proactive_alert' with 'ALERT: Anomaly detected.'")
 
-    # The Deliverables Formatting (Pinterest & Tactical)
     deliverable_formats = {
         "Creative Designer (Ops)": "For 'persona_deliverables', provide 3 'Pinterest-Style Sketch Prompts'. The 'image_keyword' MUST be a highly descriptive 5-7 word prompt for an AI image generator describing a physical sketch.",
         "Digital Marketer / Campaign App (Ops)": "For 'persona_deliverables', provide 3 specific 'Ad Creative Hooks'.",
@@ -232,6 +230,13 @@ if st.session_state.auto_intelligence_generated:
     doc = st.session_state.auto_intelligence_generated
     sd = st.session_state.scraped_data
 
+    # ---------------------------------------------------------
+    # SAFETY GUARDRAIL: Prevents AttributeError from old cache
+    # ---------------------------------------------------------
+    if not isinstance(doc, dict):
+        st.warning("🔄 System architecture has been updated. Please click 'Run Sense & Respond Sequence' again to sync the new data format.")
+        st.stop()
+
     st.markdown(f"### Autonomous Intelligence: {sel_per.split('(')[0]}")
     
     # 1. RAW DATA EXPANDER
@@ -240,7 +245,7 @@ if st.session_state.auto_intelligence_generated:
         st.markdown("**Active Governance Artifacts Enforced:**")
         st.code(st.session_state.context_layer.model_dump_json(indent=2), language="json")
 
-    # 2. THE PROACTIVE ALERT (From new requirements)
+    # 2. THE PROACTIVE ALERT
     st.info("System generated proactive response:")
     with st.container(border=True):
         st.markdown(f"**{doc.get('proactive_alert', 'ALERT: Anomaly Detected.')}**")
