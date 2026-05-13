@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import pandas as pd
 import urllib.parse
+import re
 from pydantic import BaseModel
 from typing import List, Dict
 
@@ -35,11 +36,31 @@ def inject_efficient_enterprise_aesthetic():
         h2 { font-size: 1.4rem !important; font-weight: 400 !important; letter-spacing: -0.01em !important; color: #1C1C1C !important; margin-top: 1.5rem !important; margin-bottom: 1rem !important; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.5rem;}
         h3 { font-size: 0.9rem !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; color: #F7901D !important; margin-bottom: 0.5rem !important; }
         
-        div[data-testid="stVerticalBlock"] div[style*="border"] {
-            border: 1px solid #E5E7EB !important; border-radius: 0px !important; 
-            background-color: #FFFFFF !important; padding: 1.5rem !important; 
+        /* ----------------------------------------------------
+           THE FIX: Flexbox magic for Equal Height Columns 
+           ---------------------------------------------------- */
+        [data-testid="column"] {
+            display: flex;
+            flex-direction: column;
+        }
+        [data-testid="column"] > div {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        [data-testid="stVerticalBlockBorderWrapper"] {
+            height: 100% !important;
+            border: 1px solid #E5E7EB !important; 
+            border-radius: 0px !important; 
+            background-color: #FFFFFF !important; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
-            height: 100%;
+        }
+        
+        /* Inner container padding */
+        div[data-testid="stVerticalBlock"] div[style*="border"] {
+            padding: 1.25rem !important; 
+            border: none !important; /* Rely on wrapper border */
+            box-shadow: none !important;
         }
 
         .stButton>button {
@@ -51,7 +72,7 @@ def inject_efficient_enterprise_aesthetic():
         .stChatMessage { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; border-radius: 4px !important; padding: 1rem !important; }
         .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
         
-        /* Metric Styling */
+        /* Metric Styling for McKinsey KPIs */
         [data-testid="stMetricValue"] { font-size: 2rem !important; font-weight: 300 !important; color: #1C1C1C !important; }
         [data-testid="stMetricLabel"] { font-size: 0.8rem !important; font-weight: 700 !important; text-transform: uppercase !important; color: #F7901D !important; }
     </style>
@@ -247,7 +268,7 @@ if st.session_state.auto_intelligence_generated:
     # 1. HERO INSIGHT
     st.markdown(f"<div style='font-size:1.15rem; font-weight:300; line-height:1.5; color:#1C1C1C; padding: 1rem 0; border-bottom: 1px solid #E5E7EB; margin-bottom: 1.5rem;'><strong>Bleeding-Edge Signal:</strong> {sd.get('hero_insight', 'Market shift detected.')}</div>", unsafe_allow_html=True)
 
-    # 2. TRENDS & THE "SO WHAT"
+    # 2. TRENDS & THE "SO WHAT" (Perfectly aligned flex columns)
     col_trends, col_implication = st.columns([1, 1.5], gap="large")
     
     with col_trends:
@@ -267,7 +288,7 @@ if st.session_state.auto_intelligence_generated:
             st.markdown("### The 'So What?' (Virality Implication)")
             st.markdown(f"<span style='color:#49494A; font-size:1rem; font-weight:300; line-height:1.6;'>{doc.get('trend_implication', 'Detailed business implication pending...')}</span>", unsafe_allow_html=True)
 
-    # 3. MECE PILLARS 
+    # 3. MECE PILLARS (Perfectly aligned flex columns)
     st.markdown("<h2>Actionable Strategy</h2>", unsafe_allow_html=True)
     pillars = doc.get('strategic_pillars', [])
     if pillars:
@@ -315,14 +336,15 @@ if st.session_state.auto_intelligence_generated:
                 
                 with st.container(border=True):
                     if "Designer" in sel_per:
-                        # FALLBACK: Ensure raw_kw has a value, even if the LLM forgets 'image_keyword'
+                        # THE FIX: Sanitize the LLM prompt to remove URL-breaking characters
                         raw_kw = item.get('image_keyword') or item.get('title') or 'modern concept design'
-                        encoded_kw = urllib.parse.quote(f"{raw_kw} pinterest style concept art sketch highly detailed clean white background")
+                        clean_kw = re.sub(r'[^a-zA-Z0-9\s]', '', raw_kw) # Strips special characters
+                        encoded_kw = urllib.parse.quote(f"{clean_kw} pinterest style concept art sketch highly detailed clean white background")
                         
-                        # THE FIX: Added a random seed so the API doesn't cache and drop the 2nd/3rd images
-                        img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true&seed={i+100}"
+                        # THE FIX: Native st.image with dynamic random seed prevents timeout/caching issues
+                        img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true&seed={i+500}"
+                        st.image(img_url, use_container_width=True)
                         
-                        st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 0px; margin-bottom: 1rem;">', unsafe_allow_html=True)
                         st.markdown(f"**Visual Concept: {d_title}**")
                     else:
                         st.markdown(f"**{d_title}**")
@@ -331,9 +353,9 @@ if st.session_state.auto_intelligence_generated:
 
     st.divider()
     
-    # 6. KPI IMPACT & SOURCES (Dynamic Spacing Fix)
+    # 6. KPI IMPACT & SOURCES 
     if "Designer" not in sel_per:
-        # Standard layout: 2 Columns
+        # Standard layout: 2 Columns perfectly aligned via CSS
         col_kpi, col_sources = st.columns(2, gap="large")
         
         with col_kpi:
@@ -354,7 +376,8 @@ if st.session_state.auto_intelligence_generated:
                         st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
     
     else:
-        # Layout for Designer: Full width Sources (No awkward empty spaces)
+        # Dynamic fix: If Designer is selected, let sources fill the screen horizontally 
+        # so there isn't a massive blank gap where the KPIs used to be.
         st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
         sources = doc.get('source_links', [])
         if sources:
