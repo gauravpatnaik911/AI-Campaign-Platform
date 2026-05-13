@@ -13,7 +13,7 @@ except ImportError:
     st.stop()
 
 # ==========================================
-# 1. TIGER ANALYTICS x KYNDRYL AESTHETIC
+# 1. TIGER ANALYTICS x KYNDRYL (SPACE EFFICIENT)
 # ==========================================
 st.set_page_config(page_title="Tiger Analytics | Sense & Respond OS", layout="wide")
 
@@ -22,139 +22,60 @@ try:
 except Exception:
     pass
 
-def inject_enterprise_aesthetic():
+def inject_efficient_enterprise_aesthetic():
     st.markdown("""
     <style>
-        /* Base Editorial Reset */
+        /* Base Editorial Reset (Kyndryl Style) */
         html, body, [class*="css"] {
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             background-color: #FAFAFA;
             color: #1C1C1C;
         }
 
-        /* Top Header Strip */
         header[data-testid="stHeader"] {
             background-color: #FAFAFA;
-            border-bottom: 1px solid #E5E7EB;
+            border-bottom: 2px solid #F7901D; /* Tiger Orange */
         }
 
-        /* Massive, Lightweight Typography (Kyndryl Style) */
-        h1 {
-            font-size: 3.8rem !important;
-            font-weight: 300 !important;
-            letter-spacing: -0.04em !important;
-            color: #1C1C1C !important;
-            line-height: 1.1 !important;
-            padding-bottom: 1rem !important;
-            border-bottom: none !important;
-        }
-        h2 {
-            font-size: 2.2rem !important;
-            font-weight: 300 !important;
-            letter-spacing: -0.02em !important;
-            color: #1C1C1C !important;
-            margin-top: 3rem !important;
-            margin-bottom: 1.5rem !important;
-        }
-        h3 {
-            font-size: 0.85rem !important;
-            font-weight: 700 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.15em !important;
-            color: #F7901D !important; /* Tiger Orange */
-            border-bottom: 1px solid #E5E7EB !important;
-            padding-bottom: 0.5rem !important;
-            margin-bottom: 1.5rem !important;
+        /* Lightweight Typography, Space Efficient */
+        h1 { font-size: 2.2rem !important; font-weight: 300 !important; letter-spacing: -0.03em !important; color: #1C1C1C !important; padding-bottom: 0 !important; margin-bottom: 0 !important;}
+        h2 { font-size: 1.4rem !important; font-weight: 400 !important; letter-spacing: -0.01em !important; color: #1C1C1C !important; margin-top: 1.5rem !important; margin-bottom: 1rem !important; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.5rem;}
+        h3 { font-size: 0.9rem !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; color: #F7901D !important; margin-bottom: 0.5rem !important; }
+        p { font-size: 1rem !important; font-weight: 300 !important; line-height: 1.4 !important; }
+
+        /* Sharp, White Containers (No Giant Black Boxes) */
+        div[data-testid="stVerticalBlock"] div[style*="border"] {
+            border: 1px solid #E5E7EB !important;
+            border-radius: 0px !important; /* Sharp edges */
+            background-color: #FFFFFF !important;
+            padding: 1.25rem !important; /* Tighter padding for space efficiency */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
         }
 
         /* Bare, Structural Metrics */
-        [data-testid="stMetric"] {
-            background-color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            border-top: 2px solid #1C1C1C !important;
-            padding-top: 1rem !important;
-        }
-        [data-testid="stMetricValue"] {
-            font-size: 3.5rem !important;
-            font-weight: 200 !important;
-            letter-spacing: -0.03em !important;
-            color: #1C1C1C !important;
-        }
-        [data-testid="stMetricLabel"] {
-            font-size: 0.8rem !important;
-            font-weight: 700 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.1em !important;
-            color: #71717A !important;
-        }
+        [data-testid="stMetricValue"] { font-size: 2.2rem !important; font-weight: 300 !important; letter-spacing: -0.03em !important; color: #1C1C1C !important; }
+        [data-testid="stMetricLabel"] { font-size: 0.75rem !important; font-weight: 600 !important; text-transform: uppercase !important; color: #71717A !important; }
 
-        /* Sharp, High-Contrast Buttons */
+        /* Sharp Buttons */
         .stButton>button {
-            background-color: #1C1C1C !important;
-            color: #FFFFFF !important;
-            border: none !important;
-            border-radius: 0px !important;
-            font-weight: 600 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.1em !important;
-            padding: 1rem 2rem !important;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            background-color: #1C1C1C !important; color: #FFFFFF !important; border: none !important; border-radius: 0px !important;
+            font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; padding: 0.5rem 1rem !important;
         }
-        .stButton>button:hover {
-            background-color: #F7901D !important;
-            color: #1C1C1C !important;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(247, 144, 29, 0.15) !important;
-        }
-
-        /* Editorial Alerts (Dark Mode Cards inside Light UI) */
-        .stAlert {
-            background-color: #1C1C1C !important;
-            color: #FFFFFF !important;
-            border: none !important;
-            border-radius: 0px !important;
-            border-left: 4px solid #F7901D !important;
-            padding: 2rem !important;
-        }
-        .stAlert p {
-            color: #FFFFFF !important;
-            font-weight: 300 !important;
-            font-size: 1.1rem !important;
-            letter-spacing: 0.02em !important;
-        }
-
-        /* Structural Containers */
-        div[data-testid="stVerticalBlock"] div[style*="border"] {
-            border: 1px solid #E5E7EB !important;
-            border-radius: 0px !important;
-            background-color: #FFFFFF !important;
-            padding: 2.5rem !important;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.02) !important;
-        }
-
-        /* Thin Dividers */
-        hr {
-            border-top: 1px solid #E5E7EB !important;
-            margin: 3rem 0 !important;
-        }
+        .stButton>button:hover { background-color: #F7901D !important; color: #1C1C1C !important; }
 
         /* Progress Bars */
-        .stProgress > div > div > div > div { background-color: #F7901D !important; }
+        .stProgress > div > div > div > div { background-color: #F7901D !important; height: 6px !important; }
 
-        /* Whitespace & Padding */
-        .block-container { padding-top: 4rem; padding-bottom: 4rem; max-width: 1400px; }
-        
-        /* DataFrames */
+        /* Space Efficiency: Tighter main padding */
+        .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
         .stDataFrame { border-radius: 0px !important; border: 1px solid #E5E7EB !important; }
     </style>
     """, unsafe_allow_html=True)
 
-inject_enterprise_aesthetic()
+inject_efficient_enterprise_aesthetic()
 
 # ==========================================
-# 2. DATA ARCHITECTURE & GOVERNANCE
+# 2. DATA ARCHITECTURE & TAXONOMY
 # ==========================================
 class ContextLayer(BaseModel):
     data_inventory: str
@@ -173,9 +94,6 @@ def seed_context_layer(ind: str, sub: str, per: str) -> ContextLayer:
         metadata_repository="Compliance: SOC2/GDPR | Anomaly_Threshold: High"
     )
 
-# ==========================================
-# 3. SCALED ENTERPRISE TAXONOMY
-# ==========================================
 INDUSTRIES = {
     "Retail & Apparel (e.g., Nike, Gap)": ["Athleisure & Footwear", "Fast Fashion", "Luxury Apparel", "Sporting Goods"],
     "CPG & FMCG (e.g., PepsiCo)": ["Food & Beverage", "Snacks & Confectionery", "Personal Care", "Household Goods"],
@@ -185,20 +103,14 @@ INDUSTRIES = {
 }
 
 PERSONAS = [
-    "Digital Marketer / Campaign App (Ops)",
-    "Creative Designer (Ops)",
-    "Campaign Analyst (Ops)",
-    "Merchandiser / Demand Sensing (Ops)",
-    "Data Scientist (Ops)",
-    "Digital Product Owner (Ops)",
-    "Brand Manager / War Room (Strategy)",
-    "Chief Marketing Officer (Strategy)",
-    "VP of Supply Chain & Logistics (Strategy)",
-    "Chief Revenue Officer (Strategy)"
+    "Digital Marketer / Campaign App (Ops)", "Creative Designer (Ops)", "Campaign Analyst (Ops)",
+    "Merchandiser / Demand Sensing (Ops)", "Data Scientist (Ops)", "Digital Product Owner (Ops)",
+    "Brand Manager / War Room (Strategy)", "Chief Marketing Officer (Strategy)",
+    "VP of Supply Chain & Logistics (Strategy)", "Chief Revenue Officer (Strategy)"
 ]
 
 # ==========================================
-# 4. SCHEMA DEFINITIONS 
+# 3. SCHEMA DEFINITIONS 
 # ==========================================
 class StrategicSignal(BaseModel):
     feature_name: str
@@ -220,15 +132,17 @@ class OmniverseIntelligence(BaseModel):
     source_links: List[SourceLink]
 
 # ==========================================
-# 5. THE LOGIC ENGINES
+# 4. THE LOGIC ENGINES
 # ==========================================
 def simulate_external_scrape(sub_industry: str, client: Groq):
     sys_prompt = """
     You are an autonomous market anomaly detection crawler for 2026.
     Return strictly JSON with the exact keys:
     - 'market_anomaly_detected': string (Sudden competitor move, supply shock, or bleeding-edge trend).
+    - 'hero_insight': 1-sentence macro trend revelation about bleeding-edge consumer demand.
     - 'sentiment_shift': string.
     - 'viral_velocity_score': integer (0-100).
+    - 'trending_keywords': dictionary of 5 bleeding-edge phrases and their virality percentage (integer 1-100).
     """
     try:
         resp = client.chat.completions.create(
@@ -238,9 +152,11 @@ def simulate_external_scrape(sub_industry: str, client: Groq):
         return json.loads(resp.choices[0].message.content)
     except:
         return {
-            "market_anomaly_detected": "Competitor unexpectedly launched a spatial-commerce AR integration with 40% price cuts.",
+            "market_anomaly_detected": "Competitor launched a spatial-commerce AR integration with 40% price cuts.",
+            "hero_insight": "Consumers are abandoning mass-personalization for cryptographically verified authenticity.",
             "sentiment_shift": "Consumers are exhibiting high price-sensitivity and immediate brand switching.",
-            "viral_velocity_score": 92
+            "viral_velocity_score": 92,
+            "trending_keywords": {"spatial UI commerce": 100, "zero-party autonomy": 95, "neuro-aesthetic design": 90, "biophilic materials": 88, "dark-store micro-fulfillment": 80}
         }
 
 def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_data, client: Groq):
@@ -289,7 +205,7 @@ def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_da
             {{"title": "string", "description": "string", "image_keyword": "string"}} 
         ],
         "source_links": [
-            {{"title": "string (e.g., Gartner, Business of Fashion)", "url": "string"}}
+            {{"title": "string", "url": "string"}}
         ]
     }}
     """
@@ -310,27 +226,22 @@ def query_groq(prompt: str, system_context: str, client: Groq):
                 {"role": "system", "content": f"You are a helpful assistant refining the following strategy: {system_context}"},
                 {"role": "user", "content": prompt}
             ],
-            model="llama-3.1-8b-instant",
-            temperature=0.5
+            model="llama-3.1-8b-instant", temperature=0.5
         )
         return resp.choices[0].message.content
     except Exception as e:
         return f"Chat error: {e}"
 
 # ==========================================
-# 6. APP RENDERING
+# 5. STREAMLIT APP RENDERING
 # ==========================================
-
-# --- STATE MANAGEMENT ---
 if "chat_history" not in st.session_state: st.session_state.chat_history = []
 if "scraped_data" not in st.session_state: st.session_state.scraped_data = None
 if "auto_intelligence_generated" not in st.session_state: st.session_state.auto_intelligence_generated = None
 if "context_layer" not in st.session_state: st.session_state.context_layer = None
 
-# --- MAIN TITLE ---
 st.title("Tiger Analytics | Sense & Respond OS")
 
-# --- SIDEBAR CONTROLS ---
 st.sidebar.markdown("### Operational Parameters")
 sel_ind = st.sidebar.selectbox("Industry Ecosystem", list(INDUSTRIES.keys()))
 sel_sub = st.sidebar.selectbox("Sub-Industry Segment", INDUSTRIES[sel_ind])
@@ -347,7 +258,6 @@ if st.sidebar.button("Execute Autonomous Sequence", type="primary", use_containe
     with st.spinner("SENSE PHASE: Scanning global firehose for anomalies..."):
         ctx = seed_context_layer(sel_ind, sel_sub, sel_per)
         st.session_state.context_layer = ctx
-        
         anomaly = simulate_external_scrape(sel_sub, client)
         st.session_state.scraped_data = anomaly
         
@@ -362,32 +272,37 @@ if st.session_state.auto_intelligence_generated:
     sd = st.session_state.scraped_data
 
     if not isinstance(doc, dict):
-        st.warning("🔄 System architecture has been updated. Please click 'Execute Autonomous Sequence' again.")
+        st.warning("🔄 System architecture updated. Please click 'Execute Autonomous Sequence' again.")
         st.stop()
     
-    # 1. RAW DATA EXPANDER (Clean style)
-    with st.expander("View Raw Sense Engine Data & Governance Artifacts", expanded=False):
-        st.json(sd)
-        st.markdown("**Active Governance Artifacts Enforced:**")
-        st.code(st.session_state.context_layer.model_dump_json(indent=2), language="json")
-
-    # 2. THE PROACTIVE ALERT (Kyndryl dark mode style block)
-    st.info(f"**{doc.get('proactive_alert', 'ALERT: Anomaly Detected.')}**")
-
-    st.divider()
+    # --- ROW 1: ALERT & BLEEDING EDGE SIGNAL (Space Efficient Layout) ---
+    col_alert, col_trends = st.columns([1.5, 1])
     
-    # 3. VELOCITY & RISK
-    col_vel, col_risk = st.columns(2)
-    with col_vel:
-        st.metric("Viral Velocity Signal", f"{sd.get('viral_velocity_score', 85)}")
-    with col_risk:
-        st.markdown("### Structural Linchpin Risk")
-        st.markdown(f"<p style='color: #49494A; font-size: 1.1rem;'>{doc.get('linchpin_risk', 'N/A')}</p>", unsafe_allow_html=True)
+    with col_alert:
+        # The Proactive Alert (No giant black box, just clean white space and sharp typography)
+        st.markdown(f"<span style='color:#F7901D; font-weight:700; font-size:0.9rem; text-transform:uppercase;'>System Alert</span>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size:1.15rem; font-weight:300; line-height:1.5; margin-bottom:1rem;'>{doc.get('proactive_alert', 'ALERT: Anomaly Detected.')}</div>", unsafe_allow_html=True)
         
-    st.divider()
+        # The Restored Bleeding Edge Signal
+        with st.container(border=True):
+            st.markdown("### Bleeding-Edge Market Signal")
+            st.markdown(f"*{sd.get('hero_insight', 'Market shift detected.')}*")
+            
+    with col_trends:
+        # The Restored Top Trends / Progress Bars
+        with st.container(border=True):
+            st.markdown("### Top Trending Keywords")
+            keywords = sd.get("trending_keywords", {})
+            if keywords:
+                for kw, score in keywords.items():
+                    safe_score = min(max(int(score), 0), 100)
+                    st.markdown(f"<div style='margin-bottom:-10px; font-weight:600; font-size:0.85rem;'>{kw.title()}</div>", unsafe_allow_html=True)
+                    st.progress(safe_score / 100.0)
+            else:
+                st.caption("No keyword data available.")
 
-    # 4. MECE PILLARS (Missing Alpha)
-    st.markdown(f"<h2>Actionable 'Missing Alpha' Strategy</h2>", unsafe_allow_html=True)
+    # --- ROW 2: MECE PILLARS & RISK (3 Columns) ---
+    st.markdown("<h2>Actionable 'Missing Alpha' Strategy</h2>", unsafe_allow_html=True)
     pillars = doc.get('strategic_pillars', [])
     if pillars:
         cols = st.columns(len(pillars))
@@ -395,36 +310,42 @@ if st.session_state.auto_intelligence_generated:
             with cols[i]:
                 with st.container(border=True):
                     st.markdown(f"### 0{i+1} : {pillar.get('title', '').upper()}")
-                    st.markdown(f"<span style='color:#49494A; font-size:1.05rem; font-weight: 300;'>{pillar.get('description', '')}</span>", unsafe_allow_html=True)
+                    st.markdown(f"<span style='color:#49494A; font-weight:300;'>{pillar.get('description', '')}</span>", unsafe_allow_html=True)
 
-    st.divider()
-
-    # 5. EXCLUSIVE PERSONA DELIVERABLES (PINTEREST GENERATOR)
-    st.markdown(f"<h2>Exclusive Deliverables: {sel_per.split(' ')[0]}</h2>", unsafe_allow_html=True)
-    deliverables = doc.get('persona_deliverables', [])
+    # --- ROW 3: EXCLUSIVE DELIVERABLES & METRICS ---
+    col_deliv, col_metrics = st.columns([2, 1])
     
-    if deliverables:
-        del_cols = st.columns(len(deliverables))
-        for i, item in enumerate(deliverables):
-            with del_cols[i]:
-                d_title = item.get('title', 'Deliverable')
-                d_desc = item.get('description', 'Details pending.')
-                
-                with st.container(border=True):
-                    if "Designer" in sel_per:
-                        raw_kw = item.get('image_keyword', 'fashion design sketch')
-                        encoded_kw = urllib.parse.quote(f"{raw_kw} pinterest style concept art sketch highly detailed clean white background")
-                        img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true"
-                        st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 0px; margin-bottom: 1rem;">', unsafe_allow_html=True)
-                        st.markdown(f"**Visual Concept: {d_title}**")
-                    else:
-                        st.markdown(f"**Tactical Asset: {d_title}**")
+    with col_deliv:
+        st.markdown(f"<h2>Exclusive Deliverables: {sel_per.split(' ')[0]}</h2>", unsafe_allow_html=True)
+        deliverables = doc.get('persona_deliverables', [])
+        if deliverables:
+            del_cols = st.columns(len(deliverables))
+            for i, item in enumerate(deliverables):
+                with del_cols[i]:
+                    d_title = item.get('title', 'Deliverable')
+                    d_desc = item.get('description', 'Details pending.')
                     
-                    st.markdown(f"<span style='color:#49494A; font-size:1.05rem; font-weight: 300;'>{d_desc}</span>", unsafe_allow_html=True)
+                    with st.container(border=True):
+                        if "Designer" in sel_per:
+                            raw_kw = item.get('image_keyword', 'fashion design sketch')
+                            encoded_kw = urllib.parse.quote(f"{raw_kw} pinterest style concept art sketch highly detailed clean white background")
+                            img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true"
+                            # Sharp corners to match Kyndryl style
+                            st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 0px; margin-bottom: 12px;">', unsafe_allow_html=True)
+                            st.markdown(f"**{d_title}**")
+                        else:
+                            st.markdown(f"**{d_title}**")
+                        
+                        st.markdown(f"<span style='color:#49494A; font-size:0.9rem; font-weight:300;'>{d_desc}</span>", unsafe_allow_html=True)
 
-    st.divider()
+    with col_metrics:
+        st.markdown("<h2>Velocity & Risk</h2>", unsafe_allow_html=True)
+        st.metric("Viral Velocity Signal", f"{sd.get('viral_velocity_score', 85)}")
+        with st.container(border=True):
+            st.markdown("### Structural Linchpin Risk")
+            st.markdown(f"<p style='color: #49494A; font-weight:300;'>{doc.get('linchpin_risk', 'N/A')}</p>", unsafe_allow_html=True)
 
-    # 6. ARBITRAGE MATRIX
+    # --- ROW 4: ARBITRAGE MATRIX ---
     st.markdown("<h2>Initiative Prioritization & Arbitrage</h2>", unsafe_allow_html=True)
     signals = doc.get('signals', [])
     if signals:
@@ -437,9 +358,7 @@ if st.session_state.auto_intelligence_generated:
         except Exception:
             st.warning("Matrix rendering issue.")
             
-    st.divider()
-    
-    # 7. KPI & SOURCES
+    # --- ROW 5: KPI & SOURCES ---
     col_kpi, col_sources = st.columns(2)
     with col_kpi:
         st.markdown("<h2>Core KPI Impact</h2>", unsafe_allow_html=True)
@@ -448,7 +367,7 @@ if st.session_state.auto_intelligence_generated:
             for k, v in kpi_matrix.items():
                 with st.container(border=True):
                     st.markdown(f"**{k}**")
-                    st.markdown(f"<span style='color:#49494A; font-size:1.05rem; font-weight: 300;'>{v}</span>", unsafe_allow_html=True)
+                    st.markdown(f"<span style='color:#49494A; font-weight:300;'>{v}</span>", unsafe_allow_html=True)
                     
     with col_sources:
         st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
@@ -458,9 +377,14 @@ if st.session_state.auto_intelligence_generated:
                 with st.container(border=True):
                     st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
 
+    # --- ROW 6: RAW DATA EXPANDER ---
+    with st.expander("View Raw Sense Engine Data & Governance Artifacts", expanded=False):
+        st.json(sd)
+        st.code(st.session_state.context_layer.model_dump_json(indent=2), language="json")
+
     st.divider()
 
-    # 8. HUMAN-IN-THE-LOOP CHAT
+    # --- ROW 7: CHAT ---
     st.markdown("<h2>Human-in-the-Loop Refinement</h2>", unsafe_allow_html=True)
     for msg in st.session_state.chat_history:
         with st.chat_message(msg["role"]): st.markdown(msg["content"])
@@ -475,17 +399,16 @@ if st.session_state.auto_intelligence_generated:
                 st.markdown(response)
                 st.session_state.chat_history.append({"role": "assistant", "content": response})
 
-    # --- TIGER ANALYTICS OFFICIAL FOOTER ---
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    # --- FOOTER ---
+    st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
-        <div style='text-align: left; color: #71717A; font-size: 0.8rem; font-weight: 600; border-top: 1px solid #E5E7EB; padding-top: 2rem; text-transform: uppercase; letter-spacing: 0.05em;'>
+        <div style='text-align: left; color: #71717A; font-size: 0.8rem; font-weight: 600; border-top: 1px solid #E5E7EB; padding-top: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em;'>
             © 2022 - 2026, Tiger Analytics Inc. All rights reserved.<br>
             <span style='font-weight: 300; letter-spacing: 0;'>Powered by Experience Consulting Team</span>
         </div>
     """, unsafe_allow_html=True)
 
 else:
-    # Editorial Welcome State
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<h2 style='text-align: left; font-size: 3rem !important; margin-top: 0 !important; color: #1C1C1C !important;'>Welcome to the Sense & Respond OS.</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size: 1.25rem; font-weight: 300; color: #49494A; max-width: 700px;'>Configure your operational parameters in the sidebar and execute the autonomous sequence to detect real-time anomalies and trigger agentic response workflows.</p>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: left; font-size: 2.8rem !important; margin-top: 0 !important; color: #1C1C1C !important; font-weight: 300 !important; letter-spacing: -0.04em;'>Welcome to the Sense & Respond OS.</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 1.1rem; font-weight: 300; color: #49494A; max-width: 700px;'>Configure your operational parameters in the sidebar and execute the autonomous sequence to detect real-time anomalies and trigger agentic response workflows.</p>", unsafe_allow_html=True)
