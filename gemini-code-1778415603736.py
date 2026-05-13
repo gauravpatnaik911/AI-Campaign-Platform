@@ -13,7 +13,7 @@ except ImportError:
     st.stop()
 
 # ==========================================
-# 1. TIGER ANALYTICS x KYNDRYL (SPACE EFFICIENT)
+# 1. TIGER ANALYTICS x SPACE EFFICIENT UI
 # ==========================================
 st.set_page_config(page_title="Tiger Analytics | Sense & Respond OS", layout="wide")
 
@@ -25,7 +25,7 @@ except Exception:
 def inject_efficient_enterprise_aesthetic():
     st.markdown("""
     <style>
-        /* Base Editorial Reset (Kyndryl Style) */
+        /* Base Editorial Reset */
         html, body, [class*="css"] {
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             background-color: #FAFAFA;
@@ -41,20 +41,15 @@ def inject_efficient_enterprise_aesthetic():
         h1 { font-size: 2.2rem !important; font-weight: 300 !important; letter-spacing: -0.03em !important; color: #1C1C1C !important; padding-bottom: 0 !important; margin-bottom: 0 !important;}
         h2 { font-size: 1.4rem !important; font-weight: 400 !important; letter-spacing: -0.01em !important; color: #1C1C1C !important; margin-top: 1.5rem !important; margin-bottom: 1rem !important; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.5rem;}
         h3 { font-size: 0.9rem !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; color: #F7901D !important; margin-bottom: 0.5rem !important; }
-        p { font-size: 1rem !important; font-weight: 300 !important; line-height: 1.4 !important; }
-
-        /* Sharp, White Containers (No Giant Black Boxes) */
+        
+        /* Sharp, White Containers */
         div[data-testid="stVerticalBlock"] div[style*="border"] {
             border: 1px solid #E5E7EB !important;
-            border-radius: 0px !important; /* Sharp edges */
+            border-radius: 0px !important; 
             background-color: #FFFFFF !important;
-            padding: 1.25rem !important; /* Tighter padding for space efficiency */
+            padding: 1.25rem !important; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
         }
-
-        /* Bare, Structural Metrics */
-        [data-testid="stMetricValue"] { font-size: 2.2rem !important; font-weight: 300 !important; letter-spacing: -0.03em !important; color: #1C1C1C !important; }
-        [data-testid="stMetricLabel"] { font-size: 0.75rem !important; font-weight: 600 !important; text-transform: uppercase !important; color: #71717A !important; }
 
         /* Sharp Buttons */
         .stButton>button {
@@ -66,7 +61,15 @@ def inject_efficient_enterprise_aesthetic():
         /* Progress Bars */
         .stProgress > div > div > div > div { background-color: #F7901D !important; height: 6px !important; }
 
-        /* Space Efficiency: Tighter main padding */
+        /* Chat Messages Styling to Pop */
+        .stChatMessage {
+            background-color: #FFFFFF !important;
+            border: 1px solid #E5E7EB !important;
+            border-radius: 4px !important;
+            padding: 1rem !important;
+        }
+
+        /* Space Efficiency */
         .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
         .stDataFrame { border-radius: 0px !important; border: 1px solid #E5E7EB !important; }
     </style>
@@ -110,38 +113,13 @@ PERSONAS = [
 ]
 
 # ==========================================
-# 3. SCHEMA DEFINITIONS 
-# ==========================================
-class StrategicSignal(BaseModel):
-    feature_name: str
-    virality_score: float      
-    yield_velocity: float      
-    mbb_action_title: str      
-
-class SourceLink(BaseModel):
-    title: str
-    url: str
-
-class OmniverseIntelligence(BaseModel):
-    proactive_alert: str 
-    strategic_pillars: List[Dict[str, str]]
-    signals: List[StrategicSignal]
-    kpi_impact_matrix: Dict[str, str]
-    linchpin_risk: str
-    persona_deliverables: List[Dict[str, str]]
-    source_links: List[SourceLink]
-
-# ==========================================
-# 4. THE LOGIC ENGINES
+# 3. THE LOGIC ENGINES
 # ==========================================
 def simulate_external_scrape(sub_industry: str, client: Groq):
     sys_prompt = """
-    You are an autonomous market anomaly detection crawler for 2026.
+    You are an autonomous market anomaly crawler for 2026.
     Return strictly JSON with the exact keys:
-    - 'market_anomaly_detected': string (Sudden competitor move, supply shock, or bleeding-edge trend).
     - 'hero_insight': 1-sentence macro trend revelation about bleeding-edge consumer demand.
-    - 'sentiment_shift': string.
-    - 'viral_velocity_score': integer (0-100).
     - 'trending_keywords': dictionary of 5 bleeding-edge phrases and their virality percentage (integer 1-100).
     """
     try:
@@ -152,60 +130,49 @@ def simulate_external_scrape(sub_industry: str, client: Groq):
         return json.loads(resp.choices[0].message.content)
     except:
         return {
-            "market_anomaly_detected": "Competitor launched a spatial-commerce AR integration with 40% price cuts.",
             "hero_insight": "Consumers are abandoning mass-personalization for cryptographically verified authenticity.",
-            "sentiment_shift": "Consumers are exhibiting high price-sensitivity and immediate brand switching.",
-            "viral_velocity_score": 92,
             "trending_keywords": {"spatial UI commerce": 100, "zero-party autonomy": 95, "neuro-aesthetic design": 90, "biophilic materials": 88, "dark-store micro-fulfillment": 80}
         }
 
 def execute_omniverse_synthesis(ind, sub, per, context: ContextLayer, anomaly_data, client: Groq):
-    action_formats = {
-        "Digital Marketer / Campaign App (Ops)": "Start 'proactive_alert' with 'ALERT: [Anomaly] detected. Drafted Response Campaign:'",
-        "Creative Designer (Ops)": "Start 'proactive_alert' with 'ALERT: [Anomaly] detected. Visual Pivot Required:'",
-        "Campaign Analyst (Ops)": "Start 'proactive_alert' with 'ALERT: [Anomaly] detected. Budget Reallocation Plan:'",
-        "Merchandiser / Demand Sensing (Ops)": "Start 'proactive_alert' with 'ALERT: [Anomaly] detected. Inventory Intervention:'",
-        "Brand Manager / War Room (Strategy)": "Start 'proactive_alert' with 'ALERT: Market move detected. Strategic Counter-Positioning:'"
-    }
-    alert_format = action_formats.get(per, "Start 'proactive_alert' with 'ALERT: Anomaly detected.'")
-
+    
+    # Strictly tie deliverables to the strategy pillars so they are functional and not random
     deliverable_formats = {
-        "Creative Designer (Ops)": "For 'persona_deliverables', provide 3 'Pinterest-Style Sketch Prompts'. The 'image_keyword' MUST be a highly descriptive 5-7 word prompt for an AI image generator describing a physical sketch.",
-        "Digital Marketer / Campaign App (Ops)": "For 'persona_deliverables', provide 3 specific 'Ad Creative Hooks'.",
-        "Campaign Analyst (Ops)": "For 'persona_deliverables', provide 3 'Hyper-Targeted Experiment Hypotheses'.",
-        "Merchandiser / Demand Sensing (Ops)": "For 'persona_deliverables', provide 3 'Algorithmic SKU Interventions'.",
+        "Creative Designer (Ops)": "For 'persona_deliverables', provide 3 'Pinterest-Style Sketch Prompts' that directly execute your pillars. The 'image_keyword' MUST be a highly descriptive 5-7 word prompt for an AI image generator describing a physical sketch.",
+        "Digital Marketer / Campaign App (Ops)": "For 'persona_deliverables', provide 3 specific 'Ad Creative Hooks' that directly execute your pillars.",
+        "Campaign Analyst (Ops)": "For 'persona_deliverables', provide 3 'Hyper-Targeted Experiment Hypotheses' that directly execute your pillars.",
+        "Merchandiser / Demand Sensing (Ops)": "For 'persona_deliverables', provide 3 'Algorithmic SKU Interventions' that directly execute your pillars.",
     }
-    deliv_format = deliverable_formats.get(per, "Provide 3 highly specific tactical deliverables for this persona.")
+    deliv_format = deliverable_formats.get(per, "For 'persona_deliverables', provide 3 highly functional, non-random tactical assets that directly execute the 3 strategic pillars above. They must be exact files, mockups, or documents this persona would actually create.")
 
     sys_prompt = f"""
-    You are an autonomous Sense & Respond Agent advising a {per} at an enterprise like Nike or PepsiCo in the {sub} ({ind}) sector.
+    You are an autonomous Agent advising a {per} at an enterprise like Nike or PepsiCo in the {sub} ({ind}) sector.
     
     GOVERNANCE CONTEXT: {context.model_dump_json()}
-    LIVE ANOMALY DETECTED: {json.dumps(anomaly_data)}
+    LIVE MACRO TREND DATA: {json.dumps(anomaly_data)}
 
     MANDATES:
-    1. {alert_format}
+    1. Identify the "missing alpha"—the absolute bleeding-edge trend competitors are ignoring. 
     2. {deliv_format}
-    3. Identify the "missing alpha"—the absolute bleeding-edge trend competitors are ignoring. Do NOT use generic business fluff.
+    3. Ensure the 'trend_implication' explicitly explains the "So What?"—why these specific virality keywords matter right now to the business bottom line.
 
     OUTPUT FORMAT (STRICT JSON EXACTLY AS SHOWN BELOW):
     {{
-        "proactive_alert": "string (The ALERT statement required above)",
+        "trend_implication": "string (Detailed explanation of why these keywords are trending and the immediate business implication)",
         "strategic_pillars": [
             {{"title": "string", "description": "string (Exact execution instructions)"}},
             {{"title": "string", "description": "string"}},
             {{"title": "string", "description": "string"}}
         ],
         "signals": [
-            {{"feature_name": "string", "virality_score": 90.5, "yield_velocity": 2.4, "mbb_action_title": "string"}}
+            {{"feature_name": "string (Name of initiative)", "virality_score": 90.5, "yield_velocity": 2.4, "mbb_action_title": "string (Why do this?)"}}
         ],
         "kpi_impact_matrix": {{"KPI 1": "Impact", "KPI 2": "Impact", "KPI 3": "Impact"}},
-        "linchpin_risk": "string",
         "persona_deliverables": [
             {{"title": "string", "description": "string", "image_keyword": "string"}} 
         ],
         "source_links": [
-            {{"title": "string", "url": "string"}}
+            {{"title": "string (e.g., Gartner, Business of Fashion)", "url": "string"}}
         ]
     }}
     """
@@ -233,20 +200,19 @@ def query_groq(prompt: str, system_context: str, client: Groq):
         return f"Chat error: {e}"
 
 # ==========================================
-# 5. STREAMLIT APP RENDERING
+# 4. STREAMLIT APP RENDERING
 # ==========================================
 if "chat_history" not in st.session_state: st.session_state.chat_history = []
 if "scraped_data" not in st.session_state: st.session_state.scraped_data = None
 if "auto_intelligence_generated" not in st.session_state: st.session_state.auto_intelligence_generated = None
 if "context_layer" not in st.session_state: st.session_state.context_layer = None
 
-st.title("Tiger Analytics | Sense & Respond OS")
+st.title("Tiger Analytics | OS")
 
 st.sidebar.markdown("### Operational Parameters")
 sel_ind = st.sidebar.selectbox("Industry Ecosystem", list(INDUSTRIES.keys()))
 sel_sub = st.sidebar.selectbox("Sub-Industry Segment", INDUSTRIES[sel_ind])
 sel_per = st.sidebar.selectbox("Autonomous Agent Persona", PERSONAS)
-
 st.sidebar.divider()
 
 if "GROQ_API_KEY" not in st.secrets:
@@ -261,7 +227,7 @@ if st.sidebar.button("Execute Autonomous Sequence", type="primary", use_containe
         anomaly = simulate_external_scrape(sel_sub, client)
         st.session_state.scraped_data = anomaly
         
-    with st.spinner(f"RESPOND PHASE: Generating Complete Enterprise Package for {sel_per.split(' ')[0]}..."):
+    with st.spinner(f"RESPOND PHASE: Generating {sel_per.split(' ')[0]} Package..."):
         intel = execute_omniverse_synthesis(sel_ind, sel_sub, sel_per, ctx, anomaly, client)
         st.session_state.auto_intelligence_generated = intel
         st.session_state.chat_history = []
@@ -274,35 +240,33 @@ if st.session_state.auto_intelligence_generated:
     if not isinstance(doc, dict):
         st.warning("🔄 System architecture updated. Please click 'Execute Autonomous Sequence' again.")
         st.stop()
+
+    # 1. HERO INSIGHT
+    st.markdown(f"<div style='font-size:1.15rem; font-weight:300; line-height:1.5; color:#1C1C1C; padding: 1rem 0; border-bottom: 1px solid #E5E7EB; margin-bottom: 1.5rem;'><strong>Bleeding-Edge Signal:</strong> {sd.get('hero_insight', 'Market shift detected.')}</div>", unsafe_allow_html=True)
+
+    # 2. TRENDS & THE "SO WHAT"
+    col_trends, col_implication = st.columns([1, 1.5])
     
-    # --- ROW 1: ALERT & BLEEDING EDGE SIGNAL (Space Efficient Layout) ---
-    col_alert, col_trends = st.columns([1.5, 1])
-    
-    with col_alert:
-        # The Proactive Alert (No giant black box, just clean white space and sharp typography)
-        st.markdown(f"<span style='color:#F7901D; font-weight:700; font-size:0.9rem; text-transform:uppercase;'>System Alert</span>", unsafe_allow_html=True)
-        st.markdown(f"<div style='font-size:1.15rem; font-weight:300; line-height:1.5; margin-bottom:1rem;'>{doc.get('proactive_alert', 'ALERT: Anomaly Detected.')}</div>", unsafe_allow_html=True)
-        
-        # The Restored Bleeding Edge Signal
-        with st.container(border=True):
-            st.markdown("### Bleeding-Edge Market Signal")
-            st.markdown(f"*{sd.get('hero_insight', 'Market shift detected.')}*")
-            
     with col_trends:
-        # The Restored Top Trends / Progress Bars
         with st.container(border=True):
-            st.markdown("### Top Trending Keywords")
+            st.markdown("### Top Trending Signals")
             keywords = sd.get("trending_keywords", {})
             if keywords:
                 for kw, score in keywords.items():
                     safe_score = min(max(int(score), 0), 100)
-                    st.markdown(f"<div style='margin-bottom:-10px; font-weight:600; font-size:0.85rem;'>{kw.title()}</div>", unsafe_allow_html=True)
+                    # Percentage added explicitly here, floated right
+                    st.markdown(f"<div style='margin-bottom:-10px; font-weight:600; font-size:0.85rem;'>{kw.title()} <span style='float:right; color:#F7901D;'>{safe_score}%</span></div>", unsafe_allow_html=True)
                     st.progress(safe_score / 100.0)
             else:
                 st.caption("No keyword data available.")
 
-    # --- ROW 2: MECE PILLARS & RISK (3 Columns) ---
-    st.markdown("<h2>Actionable 'Missing Alpha' Strategy</h2>", unsafe_allow_html=True)
+    with col_implication:
+        with st.container(border=True):
+            st.markdown("### The 'So What?' (Virality Implication)")
+            st.markdown(f"<span style='color:#49494A; font-size:1rem; font-weight:300; line-height:1.6;'>{doc.get('trend_implication', 'Detailed business implication pending...')}</span>", unsafe_allow_html=True)
+
+    # 3. MECE PILLARS 
+    st.markdown("<h2>Actionable Strategy</h2>", unsafe_allow_html=True)
     pillars = doc.get('strategic_pillars', [])
     if pillars:
         cols = st.columns(len(pillars))
@@ -310,55 +274,77 @@ if st.session_state.auto_intelligence_generated:
             with cols[i]:
                 with st.container(border=True):
                     st.markdown(f"### 0{i+1} : {pillar.get('title', '').upper()}")
-                    st.markdown(f"<span style='color:#49494A; font-weight:300;'>{pillar.get('description', '')}</span>", unsafe_allow_html=True)
+                    st.markdown(f"<span style='color:#49494A; font-size:0.95rem; font-weight:300;'>{pillar.get('description', '')}</span>", unsafe_allow_html=True)
 
-    # --- ROW 3: EXCLUSIVE DELIVERABLES & METRICS ---
-    col_deliv, col_metrics = st.columns([2, 1])
+    # =========================================================================
+    # 4. CHAT BOX - MOVED UP AND HIGHLIGHTED WITH COLOR
+    # =========================================================================
+    st.markdown("""
+        <div style="background-color: #FFF9F2; border-left: 4px solid #F7901D; padding: 1.5rem; margin-top: 3rem; margin-bottom: 1rem;">
+            <h2 style="margin-top: 0 !important; border: none !important;">💬 Human-in-the-Loop Refinement</h2>
+            <p style="margin: 0; color: #49494A; font-weight: 300;">Interact with the Agent below to adjust parameters, alter the tone, or approve the strategy before moving to execution deliverables.</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    with col_deliv:
-        st.markdown(f"<h2>Exclusive Deliverables: {sel_per.split(' ')[0]}</h2>", unsafe_allow_html=True)
-        deliverables = doc.get('persona_deliverables', [])
-        if deliverables:
-            del_cols = st.columns(len(deliverables))
-            for i, item in enumerate(deliverables):
-                with del_cols[i]:
-                    d_title = item.get('title', 'Deliverable')
-                    d_desc = item.get('description', 'Details pending.')
+    for msg in st.session_state.chat_history:
+        with st.chat_message(msg["role"]): st.markdown(msg["content"])
+            
+    if prompt := st.chat_input("Refine the strategy, adjust tone, or approve..."):
+        st.session_state.chat_history.append({"role": "user", "content": prompt})
+        with st.chat_message("user"): st.markdown(prompt)
+            
+        with st.chat_message("assistant"):
+            with st.spinner("Refining..."):
+                response = query_groq(prompt=prompt, system_context=json.dumps(doc), client=client)
+                st.markdown(response)
+                st.session_state.chat_history.append({"role": "assistant", "content": response})
+
+    st.divider()
+
+    # 5. FUNCTIONAL DELIVERABLES 
+    st.markdown(f"<h2>Functional Execution Assets: {sel_per.split(' ')[0]}</h2>", unsafe_allow_html=True)
+    st.caption("Directly tied to executing the strategy pillars above.")
+    deliverables = doc.get('persona_deliverables', [])
+    
+    if deliverables:
+        del_cols = st.columns(len(deliverables))
+        for i, item in enumerate(deliverables):
+            with del_cols[i]:
+                d_title = item.get('title', 'Deliverable')
+                d_desc = item.get('description', 'Details pending.')
+                
+                with st.container(border=True):
+                    if "Designer" in sel_per:
+                        raw_kw = item.get('image_keyword', 'fashion design sketch')
+                        encoded_kw = urllib.parse.quote(f"{raw_kw} pinterest style concept art sketch highly detailed clean white background")
+                        img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true"
+                        st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 0px; margin-bottom: 1rem;">', unsafe_allow_html=True)
+                        st.markdown(f"**Visual Concept: {d_title}**")
+                    else:
+                        st.markdown(f"**{d_title}**")
                     
-                    with st.container(border=True):
-                        if "Designer" in sel_per:
-                            raw_kw = item.get('image_keyword', 'fashion design sketch')
-                            encoded_kw = urllib.parse.quote(f"{raw_kw} pinterest style concept art sketch highly detailed clean white background")
-                            img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true"
-                            # Sharp corners to match Kyndryl style
-                            st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 0px; margin-bottom: 12px;">', unsafe_allow_html=True)
-                            st.markdown(f"**{d_title}**")
-                        else:
-                            st.markdown(f"**{d_title}**")
-                        
-                        st.markdown(f"<span style='color:#49494A; font-size:0.9rem; font-weight:300;'>{d_desc}</span>", unsafe_allow_html=True)
+                    st.markdown(f"<span style='color:#49494A; font-size:0.9rem; font-weight:300;'>{d_desc}</span>", unsafe_allow_html=True)
 
-    with col_metrics:
-        st.markdown("<h2>Velocity & Risk</h2>", unsafe_allow_html=True)
-        st.metric("Viral Velocity Signal", f"{sd.get('viral_velocity_score', 85)}")
-        with st.container(border=True):
-            st.markdown("### Structural Linchpin Risk")
-            st.markdown(f"<p style='color: #49494A; font-weight:300;'>{doc.get('linchpin_risk', 'N/A')}</p>", unsafe_allow_html=True)
+    st.divider()
 
-    # --- ROW 4: ARBITRAGE MATRIX ---
-    st.markdown("<h2>Initiative Prioritization & Arbitrage</h2>", unsafe_allow_html=True)
+    # 6. FUNCTIONAL ARBITRAGE MATRIX
+    st.markdown("<h2>Functional Arbitrage & Initiative Prioritization</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='font-weight: 300; margin-bottom: 1.5rem;'>Sort by the <strong>Arbitrage Index</strong> to mathematically prioritize the initiatives that offer the highest virality relative to their execution yield. This ensures budget is allocated to maximum-impact signals.</p>", unsafe_allow_html=True)
+    
     signals = doc.get('signals', [])
     if signals:
         try:
             sig_df = pd.DataFrame(signals)
             sig_df['Arbitrage Index'] = (sig_df['virality_score'] * sig_df['yield_velocity']).round(2)
             sig_df = sig_df.sort_values(by='Arbitrage Index', ascending=False)
-            sig_df = sig_df.rename(columns={"feature_name": "Initiative", "mbb_action_title": "Execution Directive", "virality_score": "Virality Score", "yield_velocity": "Yield Velocity"})
+            sig_df = sig_df.rename(columns={"feature_name": "Initiative", "mbb_action_title": "Execution Directive / So What?", "virality_score": "Virality Score", "yield_velocity": "Yield Velocity"})
             st.dataframe(sig_df, use_container_width=True, hide_index=True)
         except Exception:
             st.warning("Matrix rendering issue.")
             
-    # --- ROW 5: KPI & SOURCES ---
+    st.divider()
+    
+    # 7. KPI & SOURCES
     col_kpi, col_sources = st.columns(2)
     with col_kpi:
         st.markdown("<h2>Core KPI Impact</h2>", unsafe_allow_html=True)
@@ -376,28 +362,6 @@ if st.session_state.auto_intelligence_generated:
             for src in sources:
                 with st.container(border=True):
                     st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
-
-    # --- ROW 6: RAW DATA EXPANDER ---
-    with st.expander("View Raw Sense Engine Data & Governance Artifacts", expanded=False):
-        st.json(sd)
-        st.code(st.session_state.context_layer.model_dump_json(indent=2), language="json")
-
-    st.divider()
-
-    # --- ROW 7: CHAT ---
-    st.markdown("<h2>Human-in-the-Loop Refinement</h2>", unsafe_allow_html=True)
-    for msg in st.session_state.chat_history:
-        with st.chat_message(msg["role"]): st.markdown(msg["content"])
-            
-    if prompt := st.chat_input("Refine the strategy, adjust tone, or approve..."):
-        st.session_state.chat_history.append({"role": "user", "content": prompt})
-        with st.chat_message("user"): st.markdown(prompt)
-            
-        with st.chat_message("assistant"):
-            with st.spinner("Refining..."):
-                response = query_groq(prompt=prompt, system_context=json.dumps(doc), client=client)
-                st.markdown(response)
-                st.session_state.chat_history.append({"role": "assistant", "content": response})
 
     # --- FOOTER ---
     st.markdown("<br>", unsafe_allow_html=True)
