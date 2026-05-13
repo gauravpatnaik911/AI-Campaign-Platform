@@ -230,9 +230,6 @@ if st.session_state.auto_intelligence_generated:
     doc = st.session_state.auto_intelligence_generated
     sd = st.session_state.scraped_data
 
-    # ---------------------------------------------------------
-    # SAFETY GUARDRAIL: Prevents AttributeError from old cache
-    # ---------------------------------------------------------
     if not isinstance(doc, dict):
         st.warning("🔄 System architecture has been updated. Please click 'Run Sense & Respond Sequence' again to sync the new data format.")
         st.stop()
@@ -275,7 +272,9 @@ if st.session_state.auto_intelligence_generated:
 
     st.divider()
 
-    # 5. EXCLUSIVE PERSONA DELIVERABLES (PINTEREST GENERATOR)
+    # ----------------------------------------------------------------------
+    # 5. EXCLUSIVE PERSONA DELIVERABLES (FIXED HTML INJECTION)
+    # ----------------------------------------------------------------------
     st.subheader(f"Exclusive Deliverables: {sel_per.split(' ')[0]}")
     deliverables = doc.get('persona_deliverables', [])
     
@@ -290,7 +289,12 @@ if st.session_state.auto_intelligence_generated:
                     if "Designer" in sel_per:
                         raw_kw = item.get('image_keyword', 'fashion design sketch')
                         encoded_kw = urllib.parse.quote(f"{raw_kw} pinterest style concept art sketch highly detailed clean white background")
-                        st.image(f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true", use_container_width=True)
+                        
+                        img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true"
+                        
+                        # BYPASS STREAMLIT'S IMAGE TIMEOUT WITH RAW HTML
+                        st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">', unsafe_allow_html=True)
+                        
                         st.markdown(f"**Visual Concept: {d_title}**")
                     else:
                         st.markdown(f"**Tactical Asset: {d_title}**")
