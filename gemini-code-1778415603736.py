@@ -354,9 +354,15 @@ else:
                 with del_cols[i]:
                     with st.container(border=True):
                         if any(role in sel_per for role in ["Designer", "Marketing", "Merchandiser"]):
-                            raw_title = item.get('title', 'concept')
-                            clean_terms = re.sub(r'[^a-zA-Z\s]', '', raw_title).strip().replace(' ', ',')
-                            img_url = f"https://loremflickr.com/600/400/pinterest,aesthetic,{clean_terms}?lock={i+150}"
+                            # THE FIX: Constructing a strict photographic prompt to prevent text/chart hallucinations
+                            raw_title = item.get('title', 'product concept')
+                            clean_terms = re.sub(r'[^a-zA-Z\s]', '', raw_title).strip()
+                            prompt = f"High end commercial product photography of {clean_terms}, 8k resolution, highly detailed, clean studio lighting, no text, no words"
+                            encoded_kw = urllib.parse.quote(prompt)
+                            
+                            # Using Pollinations AI with the hyper-specific visual prompt
+                            img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true&seed={i+500}"
+                            
                             st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 4px; margin-bottom: 12px; border: 1px solid #E5E7EB;">', unsafe_allow_html=True)
                             
                         st.markdown(f"**{item.get('title', 'Asset')}**")
@@ -405,21 +411,16 @@ else:
             </div>
         """, unsafe_allow_html=True)
         
-        # Fixed height container to act as a proper side-panel chat window
         chat_container = st.container(height=800)
         with chat_container:
             for msg in st.session_state.chat_history:
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"])
                     
-        # The input box docks naturally to the bottom of the column
         if prompt := st.chat_input("Interact with the Agent..."):
             st.session_state.chat_history.append({"role": "user", "content": prompt})
-            
-            # Immediately show user message
             with chat_container:
                 with st.chat_message("user"): st.markdown(prompt)
-                
                 with st.chat_message("assistant"):
                     with st.spinner("Processing..."):
                         try:
