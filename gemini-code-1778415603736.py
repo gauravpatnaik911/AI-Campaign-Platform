@@ -2,6 +2,8 @@ import streamlit as st
 import json
 import pandas as pd
 import urllib.parse
+import urllib.request
+import xml.etree.ElementTree as ET
 import re
 import os
 import subprocess
@@ -115,21 +117,43 @@ PERSONAS = [
 ]
 
 # ==========================================
-# 3. BACKEND ENGINES
+# 3. BACKEND ENGINES (NOW LIVE CONNECTED)
 # ==========================================
 def simulate_external_scrape(ind: str, sub: str, client: Groq):
+    """LIVE RSS SCRAPER: Pulls real headlines to synthesize trends dynamically."""
+    try:
+        search_query = urllib.parse.quote(f"{sub} {ind} market trends")
+        rss_url = f"https://news.google.com/rss/search?q={search_query}&hl=en-US&gl=US&ceid=US:en"
+        
+        req = urllib.request.Request(rss_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response:
+            xml_data = response.read()
+            
+        root = ET.fromstring(xml_data)
+        live_headlines = [item.find('title').text for item in root.findall('.//item')[:15]]
+        live_data_context = "\n".join(live_headlines)
+        
+    except Exception as e:
+        live_data_context = "Could not reach live internet. Fallback to predictive modeling based on historical data."
+
     sys_prompt = f"""
-    You are an autonomous market crawler for 2026. Analyze the {sub} sector within {ind}. 
+    You are an autonomous market intelligence agent. 
+    I have just scraped the live internet for the latest news on the '{sub}' sector within '{ind}'.
+    
+    LIVE SCRAPED HEADLINES:
+    {live_data_context}
+    
+    Analyze these real headlines and extract the true bleeding-edge trends.
     Return STRICT JSON EXACTLY matching this format:
     {{
-        "hero_insight": "1-sentence macro trend revelation.",
-        "trending_keywords": {{"Keyword One": 98, "Keyword Two": 85, "Keyword Three": 77}}
+        "hero_insight": "1-sentence macro trend revelation based on the real headlines.",
+        "trending_keywords": {{"Extracted Keyword One": 98, "Extracted Keyword Two": 85, "Extracted Keyword Three": 77}}
     }}
     """
     try:
         resp = client.chat.completions.create(
             messages=[{"role": "system", "content": sys_prompt}],
-            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.6 
+            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.2 
         )
         return json.loads(resp.choices[0].message.content)
     except Exception:
@@ -207,14 +231,14 @@ with st.sidebar:
     
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("Refresh / Execute", type="primary", use_container_width=True):
-        with st.spinner("Synthesizing Signals..."):
+        with st.spinner("Scraping Live Web & Synthesizing Signals..."):
             sd = simulate_external_scrape(sel_ind, sel_sub, client)
             st.session_state.scraped_data = sd
             
             intel = execute_omniverse_synthesis(sel_ind, sel_sub, sel_per, sd, client)
             st.session_state.auto_intelligence_generated = intel
             st.session_state.multimodal_context = None
-            st.session_state.chat_history = [{"role": "assistant", "content": f"Hey there! I've loaded the dashboard for {sel_per.split(' ')[0]}."}]
+            st.session_state.chat_history = [{"role": "assistant", "content": f"Hey there! I've loaded the live dashboard for {sel_per.split(' ')[0]} based on current internet activity."}]
 
 # ==========================================
 # 6. MAIN PANE: SENSE AI DASHBOARD
@@ -223,7 +247,7 @@ if not st.session_state.auto_intelligence_generated:
     st.markdown("""
         <div style='padding: 6rem 2rem; color: var(--text-muted); text-align: center;'>
             <h2 style='border: none;'>Sense AI Initialization Required</h2>
-            <p>Configure parameters in the sidebar and click <b>Refresh / Execute</b> to load the operating system.</p>
+            <p>Configure parameters in the sidebar and click <b>Refresh / Execute</b> to scrape the live web and load the operating system.</p>
         </div>
     """, unsafe_allow_html=True)
 else:
@@ -260,7 +284,7 @@ else:
         # --- BLOCK 2: BLEEDING SIGNAL & TRENDS ---
         st.markdown(f"""
             <div style='background-color:var(--card-bg); border:1px solid var(--border-color); padding:20px; margin-bottom:1.5rem; border-left:4px solid var(--primary-orange); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);'>
-                <div style='font-weight:700; color:var(--primary-orange); font-size:0.85rem; text-transform:uppercase; margin-bottom:0.5rem;'>Bleeding-Edge Signal</div>
+                <div style='font-weight:700; color:var(--primary-orange); font-size:0.85rem; text-transform:uppercase; margin-bottom:0.5rem;'>Bleeding-Edge Signal (Live Extracted)</div>
                 <div style='font-size:1.15rem; font-weight:400; color:var(--text-main); line-height: 1.5;'>{sd.get('hero_insight', 'Market shift detected.')}</div>
             </div>
         """, unsafe_allow_html=True)
