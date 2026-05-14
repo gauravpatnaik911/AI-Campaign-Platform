@@ -16,7 +16,7 @@ except ImportError:
     st.stop()
 
 # ==========================================
-# 1. UI & BRANDING SETTINGS (SENSE AI CSS)
+# 1. UI & BRANDING SETTINGS (FLUID SENSE AI CSS)
 # ==========================================
 st.set_page_config(page_title="Tiger Analytics | Sense & Respond", layout="wide", initial_sidebar_state="expanded")
 
@@ -28,15 +28,15 @@ except Exception:
 def inject_studio_aesthetic():
     st.markdown("""
     <style>
-        /* CSS Variables from Reimagine BI */
+        /* CSS Variables */
         :root {
             --primary-orange: #f48221;
             --sidebar-bg: #fdf8f4;
             --card-bg: #ffffff;
-            --main-bg: #f5f5f5;
-            --text-main: #333333;
-            --text-muted: #666666;
-            --border-color: #eeeeee;
+            --main-bg: #f4f5f7;
+            --text-main: #202124;
+            --text-muted: #5f6368;
+            --border-color: #e8eaed;
         }
 
         /* Base Reset */
@@ -47,38 +47,41 @@ def inject_studio_aesthetic():
         }
         
         /* Top Header & Sidebar */
-        header[data-testid="stHeader"] { background-color: var(--primary-orange); border-bottom: none; height: 50px;}
+        header[data-testid="stHeader"] { background-color: var(--primary-orange); border-bottom: none; height: 5px;}
         [data-testid="stSidebar"] { background-color: var(--sidebar-bg) !important; border-right: 1px solid var(--border-color); }
         [data-testid="stAppViewContainer"] { background-color: var(--main-bg); }
         
         /* Typography */
-        h1 { font-size: 2rem !important; font-weight: 700 !important; color: var(--text-main) !important; margin-bottom: 0.5rem !important;}
-        h2 { font-size: 1.2rem !important; font-weight: 600 !important; color: var(--text-main) !important; margin-top: 1rem !important; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;}
-        h3 { font-size: 0.85rem !important; font-weight: 700 !important; color: var(--text-muted) !important; margin-bottom: 0.5rem !important; }
+        h1 { font-size: 2.2rem !important; font-weight: 700 !important; color: var(--text-main) !important; margin-bottom: 0.5rem !important; letter-spacing: -0.02em;}
+        h2 { font-size: 1.3rem !important; font-weight: 600 !important; color: var(--text-main) !important; margin-top: 1rem !important; margin-bottom: 1rem !important;}
+        h3 { font-size: 0.85rem !important; font-weight: 700 !important; color: var(--text-muted) !important; margin-bottom: 0.5rem !important; text-transform: uppercase; letter-spacing: 0.05em; }
         
-        /* Cards */
+        /* Fluid Cards */
         [data-testid="stVerticalBlockBorderWrapper"] {
             border: 1px solid var(--border-color) !important; 
-            border-radius: 12px !important; 
+            border-radius: 16px !important; 
             background: var(--card-bg) !important; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03) !important;
             height: 100% !important;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
         }
-        div[data-testid="stVerticalBlock"] div[style*="border"] { padding: 20px !important; border: none !important; box-shadow: none !important; }
+        [data-testid="stVerticalBlockBorderWrapper"]:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06) !important;
+        }
+        div[data-testid="stVerticalBlock"] div[style*="border"] { padding: 24px !important; border: none !important; box-shadow: none !important; }
 
         /* Buttons */
         .stButton>button {
-            background-color: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid var(--primary-orange) !important; border-radius: 8px !important;
-            font-weight: 600 !important; padding: 0.5rem 1rem !important;
+            background-color: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important; border-radius: 8px !important;
+            font-weight: 600 !important; padding: 0.6rem 1.2rem !important; transition: all 0.2s ease;
         }
-        .stButton>button:hover { background-color: var(--primary-orange) !important; color: #FFFFFF !important; }
+        .stButton>button:hover { background-color: var(--primary-orange) !important; color: #FFFFFF !important; border-color: var(--primary-orange) !important; }
         
-        .stProgress > div > div > div > div { background-color: var(--primary-orange) !important; height: 8px !important; }
-        .stChatMessage { background-color: #FFFFFF !important; border: 1px solid var(--border-color) !important; border-radius: 8px !important; }
-        .block-container { padding-top: 1rem; padding-bottom: 2rem; max-width: 1600px; }
+        .stProgress > div > div > div > div { background-color: var(--primary-orange) !important; height: 8px !important; border-radius: 4px; }
         
-        /* Right Panel Chat specific styling */
-        .chat-panel { background: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); height: 100%;}
+        /* Chat UI */
+        .stChatMessage { background-color: #FFFFFF !important; border: 1px solid var(--border-color) !important; border-radius: 12px !important; padding: 1rem !important; box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;}
+        .block-container { padding-top: 2rem; padding-bottom: 4rem; max-width: 1600px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -117,19 +120,23 @@ def simulate_external_scrape(ind: str, sub: str, client: Groq):
     try:
         resp = client.chat.completions.create(
             messages=[{"role": "system", "content": sys_prompt}],
-            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.5 
+            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.6 
         )
         return json.loads(resp.choices[0].message.content)
     except Exception:
         return {
-            "hero_insight": "Consumers are shifting towards hyper-localized, on-demand micro-manufacturing.",
-            "trending_keywords": {"Micro-manufacturing": 94, "Hyper-local drops": 89, "Synthetic materials": 82}
+            "hero_insight": "Consumers are shifting towards hyper-localized, sustainable micro-manufacturing.",
+            "trending_keywords": {"Sustainable Materials": 94, "Circular Fashion": 89, "Eco-Friendly": 82}
         }
 
 def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
+    # Enforcing strict visual prompts for the image generator
     sys_prompt = f"""
     You are an autonomous Agent advising a {per} in the {sub} ({ind}) sector.
     LIVE TREND DATA: {json.dumps(anomaly_data)}
+
+    CRITICAL RULES FOR IMAGES: 
+    For 'persona_deliverables', the 'image_prompt' MUST be a description of a physical photograph or object (e.g., "A highly detailed, photorealistic 8k studio photography of a sustainable sneaker, clean white background, NO TEXT, NO FONTS, NO WATERMARKS"). Never ask for charts, text, or UI designs.
 
     OUTPUT FORMAT (STRICT JSON):
     {{
@@ -138,7 +145,7 @@ def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
             {{"label": "string (e.g., DSM Rate)", "value": "string (e.g., 81.7%)", "trend": "string (e.g., -5.70%)", "status": "negative or positive"}}
         ],
         "strategic_pillars": [ {{"title": "string", "description": "string"}} ],
-        "persona_deliverables": [ {{"title": "string", "description": "string"}} ],
+        "persona_deliverables": [ {{"title": "string", "description": "string", "image_prompt": "string (Highly detailed visual description for an AI image generator. NO TEXT.)"}} ],
         "chatQuickStart": ["string (question)", "string", "string"]
     }}
     """
@@ -186,8 +193,7 @@ if "auto_intelligence_generated" not in st.session_state: st.session_state.auto_
 # 5. SIDEBAR: NAVIGATION & UPLOADS
 # ==========================================
 with st.sidebar:
-    st.markdown(f"<h3 style='color: var(--text-main) !important;'>Tiger Analytics</h3>", unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='color: var(--text-main) !important; margin-top:0 !important;'>Tiger Analytics</h2>", unsafe_allow_html=True)
     
     sel_per = st.selectbox("Role", PERSONAS)
     st.divider()
@@ -206,7 +212,7 @@ with st.sidebar:
     
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("Refresh / Execute", use_container_width=True):
-        with st.spinner("Processing..."):
+        with st.spinner("Synthesizing Signals..."):
             sd = simulate_external_scrape(sel_ind, sel_sub, client)
             st.session_state.scraped_data = sd
             
@@ -225,49 +231,48 @@ with st.sidebar:
 # ==========================================
 if not st.session_state.auto_intelligence_generated:
     st.markdown("""
-        <div style='padding: 4rem 2rem; color: var(--text-muted); text-align: center;'>
-            <h2>Sense AI Initialization Required</h2>
-            <p>Configure parameters in the sidebar and click Refresh to load the OS.</p>
+        <div style='padding: 6rem 2rem; color: var(--text-muted); text-align: center;'>
+            <h2 style='border: none;'>Sense AI Initialization Required</h2>
+            <p>Configure parameters in the sidebar and click <b>Refresh / Execute</b> to load the operating system.</p>
         </div>
     """, unsafe_allow_html=True)
 else:
     doc = st.session_state.auto_intelligence_generated
     sd = st.session_state.scraped_data
 
-    # --- SAFETY GUARDRAIL: Prevents AttributeError if cache holds old string data ---
     if not isinstance(doc, dict):
         st.session_state.auto_intelligence_generated = None
-        st.warning("🔄 Memory cache conflict detected and cleared. Please click 'Refresh / Execute' again.")
+        st.warning("🔄 Memory cache conflict detected. Please click 'Refresh / Execute' again.")
         st.stop()
 
-    # Layout matches the 1fr | 350px CSS grid structure
+    # Fluid 2-Column Layout
     col_dash, col_chat = st.columns([3, 1.2], gap="large")
 
     with col_dash:
         st.markdown(f"<h1>Overview: {sel_per.split(' ')[0]}</h1>", unsafe_allow_html=True)
         
-        # --- BLOCK 1: KPI SUMMARY METRICS (From JSON Schema) ---
+        # --- BLOCK 1: KPI SUMMARY METRICS ---
         metrics = doc.get('summaryMetrics', [])
         if metrics:
             m_cols = st.columns(len(metrics), gap="medium")
-            for i, m in enumerate(metrics[:3]): # Max 3 for clean UI
+            for i, m in enumerate(metrics[:3]): 
                 color = "#d9534f" if m.get("status") == "negative" else "#5cb85c"
                 arrow = "↓" if m.get("status") == "negative" else "↑"
                 with m_cols[i]:
                     st.markdown(f"""
-                        <div style='background: #fff; padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border-color);'>
-                            <div style='font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 5px;'>{m.get('label', 'Metric')}</div>
-                            <div style='font-size: 26px; font-weight: 700; color: #000; margin-bottom: 2px;'>{m.get('value', '0')}</div>
-                            <div style='font-size: 12px; color: {color}; font-weight: 500;'>{arrow} {m.get('trend', '0%')} vs QoQ</div>
+                        <div style='background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02);'>
+                            <div style='font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;'>{m.get('label', 'Metric')}</div>
+                            <div style='font-size: 28px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;'>{m.get('value', '0')}</div>
+                            <div style='font-size: 13px; color: {color}; font-weight: 600;'>{arrow} {m.get('trend', '0%')} <span style='color: var(--text-muted); font-weight: 400;'>vs QoQ</span></div>
                         </div>
                     """, unsafe_allow_html=True)
             st.markdown("<br>", unsafe_allow_html=True)
 
         # --- BLOCK 2: BLEEDING SIGNAL & TRENDS ---
         st.markdown(f"""
-            <div style='background-color:#fff; border:1px solid var(--border-color); padding:1.25rem; margin-bottom:1.5rem; border-left:4px solid var(--primary-orange); border-radius: 8px;'>
+            <div style='background-color:var(--card-bg); border:1px solid var(--border-color); padding:20px; margin-bottom:1.5rem; border-left:4px solid var(--primary-orange); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);'>
                 <div style='font-weight:700; color:var(--primary-orange); font-size:0.85rem; text-transform:uppercase; margin-bottom:0.5rem;'>Bleeding-Edge Signal</div>
-                <div style='font-size:1.1rem; font-weight:400; color:var(--text-main);'>{sd.get('hero_insight', 'Market shift detected.')}</div>
+                <div style='font-size:1.15rem; font-weight:400; color:var(--text-main); line-height: 1.5;'>{sd.get('hero_insight', 'Market shift detected.')}</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -278,13 +283,13 @@ else:
                 for kw, score in sd.get("trending_keywords", {}).items():
                     try:
                         safe_score = min(max(int(score), 0), 100)
-                        st.markdown(f"<div style='margin-bottom:-10px; font-weight:600; font-size:0.85rem; color:var(--text-main);'>{str(kw).title()} <span style='float:right; color:var(--primary-orange);'>{safe_score}%</span></div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='margin-bottom:-8px; font-weight:600; font-size:0.9rem; color:var(--text-main);'>{str(kw).title()} <span style='float:right; color:var(--primary-orange);'>{safe_score}%</span></div>", unsafe_allow_html=True)
                         st.progress(safe_score / 100.0)
                     except ValueError: continue
         with c_imp:
             with st.container(border=True):
                 st.markdown("### Contextual Implication")
-                st.markdown(f"<span style='color:var(--text-muted); font-size:0.95rem; line-height:1.6;'>{doc.get('trend_implication', '')}</span>", unsafe_allow_html=True)
+                st.markdown(f"<span style='color:var(--text-muted); font-size:1rem; line-height:1.6;'>{doc.get('trend_implication', '')}</span>", unsafe_allow_html=True)
 
         # --- BLOCK 3: AGENTIC MULTIMODAL STUDIO ---
         if st.session_state.multimodal_context:
@@ -313,7 +318,7 @@ else:
                 else:
                     st.info("Multimodal Context Ingested.")
 
-        # --- BLOCK 4: DELIVERABLES ---
+        # --- BLOCK 4: DELIVERABLES (FIXED IMAGES) ---
         st.markdown(f"<h2>Functional Deliverables</h2>", unsafe_allow_html=True)
         deliverables = doc.get('persona_deliverables', [])
         if deliverables:
@@ -321,32 +326,43 @@ else:
             for i, item in enumerate(deliverables):
                 with del_cols[i]:
                     with st.container(border=True):
+                        # Generate Image ONLY for visual personas to save API calls
                         if any(role in sel_per for role in ["Designer", "Marketing", "Merchandiser"]):
-                            raw_title = item.get('title', 'concept')
-                            clean_terms = re.sub(r'[^a-zA-Z\s]', '', raw_title).strip().replace(' ', ',')
-                            img_url = f"https://loremflickr.com/600/400/pinterest,aesthetic,{clean_terms}?lock={i+150}"
-                            st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 8px; margin-bottom: 12px;">', unsafe_allow_html=True)
-                        st.markdown(f"<div style='font-weight:600; font-size:15px; margin-bottom:5px;'>{item.get('title', 'Asset')}</div>", unsafe_allow_html=True)
-                        st.markdown(f"<div style='color:var(--text-muted); font-size:13px;'>{item.get('description', '')}</div>", unsafe_allow_html=True)
+                            # Use the strictly enforced visual image_prompt
+                            raw_prompt = item.get('image_prompt', item.get('title', 'modern product photography'))
+                            
+                            # Clean and encode the prompt for Pollinations AI
+                            clean_prompt = re.sub(r'[^a-zA-Z0-9\s,]', '', raw_prompt)
+                            encoded_kw = urllib.parse.quote(f"{clean_prompt} highly detailed, 8k, no text")
+                            
+                            # Generate Image via Pollinations
+                            img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true&seed={i+100}"
+                            st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 12px; margin-bottom: 16px;">', unsafe_allow_html=True)
+                            
+                        st.markdown(f"<div style='font-weight:700; font-size:16px; margin-bottom:8px; color:var(--text-main);'>{item.get('title', 'Asset')}</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='color:var(--text-muted); font-size:14px; line-height: 1.5;'>{item.get('description', '')}</div>", unsafe_allow_html=True)
 
-    # ==================== RIGHT PANE: CHAT AI ====================
+    # ==================== RIGHT PANE: CHAT AI (FLUID) ====================
     with col_chat:
-        st.markdown("<div class='chat-panel'>", unsafe_allow_html=True)
-        st.markdown("<h3 style='margin-bottom: 20px;'><span style='color:var(--primary-orange);'>🤖 Chat AI</span></h3>", unsafe_allow_html=True)
+        st.markdown(f"<h1>&nbsp;</h1>", unsafe_allow_html=True) # Alignment spacer
+        st.markdown("""
+            <div style='background: var(--card-bg); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.03); height: 100%; display: flex; flex-direction: column;'>
+                <h3 style='margin-bottom: 20px;'><span style='color:var(--primary-orange);'>💬 Chat AI</span></h3>
+        """, unsafe_allow_html=True)
         
-        chat_container = st.container(height=500)
+        chat_container = st.container(height=650)
         with chat_container:
             for msg in st.session_state.chat_history:
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"])
             
-            # Render "Quick Starts" from JSON if history is empty
+            # Render "Quick Starts"
             if len(st.session_state.chat_history) <= 1:
-                st.markdown("<br><div style='font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom:10px;'>Quick Start</div>", unsafe_allow_html=True)
+                st.markdown("<br><div style='font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom:12px; text-transform:uppercase;'>Quick Start</div>", unsafe_allow_html=True)
                 for qs in doc.get("chatQuickStart", []):
                     st.markdown(f"""
-                        <div style='background: #fff; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 12px; margin-bottom: 8px; cursor: pointer; color: var(--text-muted);'>
-                            {qs} <span style='float:right;'>›</span>
+                        <div style='background: var(--main-bg); padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px; margin-bottom: 10px; cursor: pointer; color: var(--text-muted); transition: all 0.2s;'>
+                            {qs} <span style='float:right; color:var(--primary-orange); font-weight:bold;'>›</span>
                         </div>
                     """, unsafe_allow_html=True)
 
@@ -355,7 +371,7 @@ else:
             with chat_container:
                 with st.chat_message("user"): st.markdown(prompt)
                 with st.chat_message("assistant"):
-                    with st.spinner("..."):
+                    with st.spinner("Thinking..."):
                         try:
                             resp = client.chat.completions.create(
                                 messages=[
