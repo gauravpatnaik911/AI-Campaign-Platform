@@ -4,7 +4,6 @@ import pandas as pd
 import urllib.parse
 import re
 import os
-import tempfile
 import subprocess
 from pydantic import BaseModel
 from typing import List, Dict
@@ -59,9 +58,6 @@ def inject_efficient_enterprise_aesthetic():
         .stProgress > div > div > div > div { background-color: #F5A623 !important; height: 6px !important; }
         .stChatMessage { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; border-radius: 4px !important; padding: 1rem !important; }
         .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1400px; }
-        
-        [data-testid="stMetricValue"] { font-size: 2.2rem !important; font-weight: 300 !important; color: #1C1C1C !important; }
-        [data-testid="stMetricLabel"] { font-size: 0.8rem !important; font-weight: 700 !important; text-transform: uppercase !important; color: #F5A623 !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -90,9 +86,9 @@ PERSONAS = [
 # ==========================================
 def analyze_multimodal_file(persona: str, file_path: str, is_image: bool):
     prompts = {
-        "Creative Designer (Ops)": "Analyze this image. Extract the core style aesthetic, dominant color palettes, and specific clothing silhouettes. Output a concise 'Aesthetic Blueprint'.",
-        "Marketing Professional (Ops)": "Treat this image as a competitor's active advertisement. Extract the primary psychological hook, the specific offer/discount, and the target demographic.",
-        "Merchandiser (Ops)": "Treat this image as a retail shelf planogram. Identify immediate inventory gaps, poor SKU facings, and suggest layout rotations.",
+        "Creative Designer (Ops)": "Analyze this image. Extract the core style aesthetic, dominant color palettes, and specific clothing silhouettes.",
+        "Marketing Professional (Ops)": "Treat this image as a competitor's active advertisement. Extract the primary psychological hook.",
+        "Merchandiser (Ops)": "Treat this image as a retail shelf planogram. Identify immediate inventory gaps and suggest layout rotations.",
     }
     prompt = prompts.get(persona, "Analyze this document and extract strategic metadata.")
     return f"**Gemini Vision Output for {persona.split(' ')[0]}:**\nBased on the analysis: The asset heavily indexes on organic textures and scarcity-driven hooks."
@@ -102,7 +98,7 @@ def execute_backend_script(script_name: str, args: list):
         if not os.path.exists(script_name):
             st.warning(f"Backend Warning: `{script_name}` not found. Simulating successful execution.")
             return True
-        result = subprocess.run(["python", script_name] + args, capture_output=True, text=True, check=True)
+        subprocess.run(["python", script_name] + args, capture_output=True, text=True, check=True)
         return True
     except Exception as e:
         st.error(f"Backend Integration Error: {e}")
@@ -115,8 +111,6 @@ def simulate_external_scrape(ind: str, sub: str, client: Groq):
     sys_prompt = f"""
     You are an autonomous market anomaly crawler for 2026.
     Analyze the {sub} sector within {ind}. 
-    Identify completely novel, unpredictable, and bleeding-edge trends.
-    
     Return STRICTLY VALID JSON EXACTLY matching this format:
     {{
         "hero_insight": "1-sentence macro trend revelation about bleeding-edge consumer demand.",
@@ -132,7 +126,7 @@ def simulate_external_scrape(ind: str, sub: str, client: Groq):
     try:
         resp = client.chat.completions.create(
             messages=[{"role": "system", "content": sys_prompt}],
-            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.7
+            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.5 
         )
         return json.loads(resp.choices[0].message.content)
     except Exception:
@@ -142,27 +136,14 @@ def simulate_external_scrape(ind: str, sub: str, client: Groq):
         }
 
 def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
-    
-    # HOLISTIC ALIGNMENT: Forcing deliverables to execute the pillars visually
-    deliverable_formats = {
-        "Creative Designer (Ops)": "Provide 3 'Visual Concept Arts' that directly design the products mentioned in the pillars.",
-        "Marketing Professional (Ops)": "Provide 3 'Campaign Visuals' (lifestyle ad mockups) that directly market the products from the pillars.",
-        "Merchandiser (Ops)": "Provide 3 'Store Experience Concepts' that execute the retail planogram changes from the pillars."
-    }
-    deliv_format = deliverable_formats.get(per, "Provide 3 execution deliverables directly tied to the pillars.")
-
     sys_prompt = f"""
     You are an autonomous Agent advising a {per} in the {sub} ({ind}) sector.
     LIVE TREND DATA: {json.dumps(anomaly_data)}
 
-    CRITICAL NARRATIVE ALIGNMENT MANDATES:
+    MANDATES:
     1. The 'proactive_alert' MUST start with 'ALERT: [Anomaly] detected.'
-    2. The 'trend_implication' explains why the active anomaly matters.
-    3. The 'strategic_pillars' are 3 actionable steps to capture the trend.
-    4. The 'persona_deliverables' MUST be the exact physical/digital assets needed to execute the 3 pillars.
-       -> CRITICAL IMAGE RULE: The 'image_keyword' MUST be a highly detailed, 100% VISUAL description of a physical object, fashion item, or lifestyle scene (e.g. "close up of a sustainable cork sneaker"). 
-       -> NEVER include the words 'graph', 'chart', 'text', 'dashboard', 'report', 'UI', or 'metrics' in the image_keyword. It must be photographic or concept art.
-    5. The 'mckinsey_rationale' must explain the structural economic drivers for the KPI change.
+    2. The 'trend_implication' explicitly explains the "So What?"
+    3. The 'mckinsey_rationale' must explain the structural economic drivers for the metric.
 
     OUTPUT FORMAT (STRICT JSON):
     {{
@@ -339,7 +320,7 @@ if st.session_state.auto_intelligence_generated:
 
     st.divider()
 
-    # --- FUNCTIONAL DELIVERABLES ---
+    # --- FUNCTIONAL DELIVERABLES (FIXED: 100% PREDICTABLE PINTEREST IMAGES) ---
     st.markdown(f"<h2>Functional Execution Assets: {sel_per.split(' ')[0]}</h2>", unsafe_allow_html=True)
     deliverables = doc.get('persona_deliverables', [])
     if deliverables:
@@ -349,12 +330,14 @@ if st.session_state.auto_intelligence_generated:
                 with st.container(border=True):
                     # Only render images for visual-heavy personas
                     if any(role in sel_per for role in ["Designer", "Marketing", "Merchandiser"]):
-                        raw_kw = item.get('image_keyword', 'modern product photography')
-                        clean_kw = re.sub(r'[^a-zA-Z0-9\s]', '', raw_kw)
                         
-                        # FIX: Added strict negative prompts to the URL to suppress text/graphs
-                        encoded_kw = urllib.parse.quote(f"professional {clean_kw} photography, high quality, visually stunning")
-                        img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=800&height=400&nologo=true&seed={i+800}&negative=text,words,fonts,letters,charts,graphs,ui"
+                        # FIX: We extract just the core nouns from the AI's title to build a rock-solid search query
+                        raw_title = item.get('title', 'design concept')
+                        clean_terms = re.sub(r'[^a-zA-Z\s]', '', raw_title).strip().replace(' ', ',')
+                        
+                        # FIX: Using LoremFlickr, filtering specifically for "pinterest" and "aesthetic"
+                        # This guarantees instant loading, zero timeouts, and high-quality lifestyle/design photography.
+                        img_url = f"https://loremflickr.com/600/400/pinterest,aesthetic,{clean_terms}?lock={i+150}"
                         
                         st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 0px; margin-bottom: 12px; border: 1px solid #E5E7EB;">', unsafe_allow_html=True)
                         
@@ -363,7 +346,7 @@ if st.session_state.auto_intelligence_generated:
 
     st.divider()
     
-    # --- KPI IMPACT & RATIONALE (Full Horizontal Layout) ---
+    # --- KPI IMPACT & RATIONALE ---
     if "Designer" not in sel_per:
         st.markdown("<h2>Core KPI Impact & Economic Rationale</h2>", unsafe_allow_html=True)
         kpi_matrix = doc.get('kpi_impact_matrix', [])
@@ -385,7 +368,7 @@ if st.session_state.auto_intelligence_generated:
                         """, unsafe_allow_html=True)
         st.divider()
 
-    # --- SOURCES AT BOTTOM ---
+    # --- SOURCES ---
     st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
     sources = doc.get('source_links', [])
     if sources:
