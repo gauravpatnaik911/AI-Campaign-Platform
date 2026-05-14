@@ -16,9 +16,9 @@ except ImportError:
     st.stop()
 
 # ==========================================
-# 1. UI & BRANDING SETTINGS (TIGER ANALYTICS)
+# 1. UI & BRANDING SETTINGS (SENSE AI CSS)
 # ==========================================
-st.set_page_config(page_title="Tiger Analytics | Sense & Respond OS", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Tiger Analytics | Sense & Respond", layout="wide", initial_sidebar_state="expanded")
 
 try:
     st.logo("tiger_logo.png", icon_image="tiger_logo.png")
@@ -28,45 +28,57 @@ except Exception:
 def inject_studio_aesthetic():
     st.markdown("""
     <style>
-        html, body, [class*="css"] {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background-color: #FAFAFA;
-            color: #1C1C1C;
+        /* CSS Variables from Reimagine BI */
+        :root {
+            --primary-orange: #f48221;
+            --sidebar-bg: #fdf8f4;
+            --card-bg: #ffffff;
+            --main-bg: #f5f5f5;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-color: #eeeeee;
         }
-        header[data-testid="stHeader"] { background-color: #FAFAFA; border-bottom: 2px solid #F5A623; }
-        
-        h1 { font-size: 2.2rem !important; font-weight: 300 !important; letter-spacing: -0.03em !important; color: #1C1C1C !important; padding-bottom: 0 !important; margin-bottom: 0 !important;}
-        h2 { font-size: 1.4rem !important; font-weight: 400 !important; letter-spacing: -0.01em !important; color: #1C1C1C !important; margin-top: 1.5rem !important; margin-bottom: 1rem !important; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.5rem;}
-        h3 { font-size: 0.9rem !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; color: #F5A623 !important; margin-bottom: 0.5rem !important; }
-        
-        /* Flexbox for equal height columns */
-        [data-testid="column"] { display: flex; flex-direction: column; }
-        [data-testid="column"] > div { flex-grow: 1; display: flex; flex-direction: column; }
-        
-        [data-testid="stVerticalBlockBorderWrapper"] {
-            height: 100% !important; border: 1px solid #E5E7EB !important; 
-            border-radius: 8px !important; background-color: #FFFFFF !important; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02) !important;
-        }
-        div[data-testid="stVerticalBlock"] div[style*="border"] { padding: 1.25rem !important; border: none !important; box-shadow: none !important; }
 
-        .stButton>button {
-            background-color: #1C1C1C !important; color: #FFFFFF !important; border: none !important; border-radius: 4px !important;
-            font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; padding: 0.5rem 1rem !important;
+        /* Base Reset */
+        html, body, [class*="css"] {
+            font-family: 'Inter', "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: var(--main-bg);
+            color: var(--text-main);
         }
-        .stButton>button:hover { background-color: #F5A623 !important; color: #1C1C1C !important; }
         
-        .stProgress > div > div > div > div { background-color: #F5A623 !important; height: 6px !important; }
+        /* Top Header & Sidebar */
+        header[data-testid="stHeader"] { background-color: var(--primary-orange); border-bottom: none; height: 50px;}
+        [data-testid="stSidebar"] { background-color: var(--sidebar-bg) !important; border-right: 1px solid var(--border-color); }
+        [data-testid="stAppViewContainer"] { background-color: var(--main-bg); }
         
-        /* Sidebar & Chat Styles */
-        [data-testid="stSidebar"] { border-right: 1px solid #E5E7EB; }
-        .stChatMessage { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; border-radius: 8px !important; padding: 0.8rem !important; font-size: 0.9rem !important; }
-        .block-container { padding-top: 2rem; padding-bottom: 2rem; max-width: 1500px; }
+        /* Typography */
+        h1 { font-size: 2rem !important; font-weight: 700 !important; color: var(--text-main) !important; margin-bottom: 0.5rem !important;}
+        h2 { font-size: 1.2rem !important; font-weight: 600 !important; color: var(--text-main) !important; margin-top: 1rem !important; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;}
+        h3 { font-size: 0.85rem !important; font-weight: 700 !important; color: var(--text-muted) !important; margin-bottom: 0.5rem !important; }
+        
+        /* Cards */
+        [data-testid="stVerticalBlockBorderWrapper"] {
+            border: 1px solid var(--border-color) !important; 
+            border-radius: 12px !important; 
+            background: var(--card-bg) !important; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+            height: 100% !important;
+        }
+        div[data-testid="stVerticalBlock"] div[style*="border"] { padding: 20px !important; border: none !important; box-shadow: none !important; }
+
+        /* Buttons */
+        .stButton>button {
+            background-color: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid var(--primary-orange) !important; border-radius: 8px !important;
+            font-weight: 600 !important; padding: 0.5rem 1rem !important;
+        }
+        .stButton>button:hover { background-color: var(--primary-orange) !important; color: #FFFFFF !important; }
+        
+        .stProgress > div > div > div > div { background-color: var(--primary-orange) !important; height: 8px !important; }
+        .stChatMessage { background-color: #FFFFFF !important; border: 1px solid var(--border-color) !important; border-radius: 8px !important; }
+        .block-container { padding-top: 1rem; padding-bottom: 2rem; max-width: 1600px; }
         
         /* Right Panel Chat specific styling */
-        .right-panel-header {
-            background-color: #FFF9F2; border-left: 4px solid #F5A623; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;
-        }
+        .chat-panel { background: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); height: 100%;}
     </style>
     """, unsafe_allow_html=True)
 
@@ -85,20 +97,20 @@ PERSONAS = [
     "Creative Designer (Ops)", 
     "Marketing Professional (Ops)", 
     "Merchandiser (Ops)", 
-    "Sales Professional (Frontline)",
+    "Supply Chain Manager (Ops)",
     "Analyst / Data Scientist (Analytical)",
     "Brand Strategy Leader (Strategy)"
 ]
 
 # ==========================================
-# 3. BACKEND ENGINES: MACRO SENSE & RESPOND
+# 3. BACKEND ENGINES
 # ==========================================
 def simulate_external_scrape(ind: str, sub: str, client: Groq):
     sys_prompt = f"""
-    You are an autonomous market anomaly crawler for 2026. Analyze the {sub} sector within {ind}. 
-    Return STRICTLY VALID JSON EXACTLY matching this format:
+    You are an autonomous market crawler for 2026. Analyze the {sub} sector within {ind}. 
+    Return STRICT JSON EXACTLY matching this format:
     {{
-        "hero_insight": "1-sentence macro trend revelation about bleeding-edge consumer demand.",
+        "hero_insight": "1-sentence macro trend revelation.",
         "trending_keywords": {{"Keyword One": 98, "Keyword Two": 85, "Keyword Three": 77}}
     }}
     """
@@ -121,11 +133,13 @@ def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
 
     OUTPUT FORMAT (STRICT JSON):
     {{
-        "trend_implication": "string (Why this trend matters financially)",
+        "trend_implication": "string (Why this trend matters)",
+        "summaryMetrics": [
+            {{"label": "string (e.g., DSM Rate)", "value": "string (e.g., 81.7%)", "trend": "string (e.g., -5.70%)", "status": "negative or positive"}}
+        ],
         "strategic_pillars": [ {{"title": "string", "description": "string"}} ],
-        "kpi_impact_matrix": [ {{"kpi_name": "string", "impact_metric": "string", "mckinsey_rationale": "string"}} ],
         "persona_deliverables": [ {{"title": "string", "description": "string"}} ],
-        "source_links": [ {{"title": "string", "url": "string"}} ]
+        "chatQuickStart": ["string (question)", "string", "string"]
     }}
     """
     try:
@@ -137,29 +151,22 @@ def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
     except:
         return None
 
-# ==========================================
-# 4. BACKEND ENGINES: MULTIMODAL STUDIO
-# ==========================================
 def analyze_multimodal_file(persona: str) -> Dict[str, Any]:
     try:
         if "Designer" in persona:
-            mock_json = '{"style_aesthetic": "Neo-Utility Athleisure", "clothing_items": ["Oversized Cargo Trousers", "Tactical Harness"], "bleeding_signal_detected": "Hyper-functional urban wear driven by unpredictable weather patterns."}'
+            mock_json = '{"style_aesthetic": "Neo-Utility Athleisure", "clothing_items": ["Oversized Cargo Trousers"], "bleeding_signal_detected": "Hyper-functional urban wear."}'
         elif "Marketing" in persona:
-            mock_json = '{"competitor_offer": "20% off sustainable basics", "visual_hook": "High-contrast minimalist typography", "bleeding_signal_detected": "Consumer fatigue with loud branding.", "counter_campaign_draft": {"email_subject_line": "Forget Basics. Discover Verified Authenticity.", "tiktok_hook": "Why everyone is throwing away their generic basics this week..."}}'
-        elif "Merchandiser" in persona:
-            mock_json = '{"missing_categories": ["Regenerative Materials", "Adaptable Outerwear"], "suggested_rotation": ["Move adaptable outerwear to primary end-cap"], "bleeding_signal_justification": "Micro-climate shifts are driving demand for layers."}'
-        elif "Analyst" in persona:
-            mock_json = '{"data_summary": "Q3 velocity dropping in legacy categories.", "correlated_bleeding_signals": ["Shift to hyper-local micro-trends"], "missed_opportunities": ["Over-indexing ad spend on saturated legacy SKUs."]}'
+            mock_json = '{"competitor_offer": "20% off sustainable basics", "visual_hook": "High-contrast minimalism", "bleeding_signal_detected": "Consumer fatigue with loud branding."}'
         else:
             mock_json = '{"status": "Agentic multimodal sequence completed."}'
         return json.loads(mock_json)
-    except json.JSONDecodeError:
-        return {"error": "Failed to parse LLM output."}
+    except:
+        return {"error": "Failed"}
 
 def execute_backend_script(script_name: str, args: list):
     try:
         if not os.path.exists(script_name):
-            st.warning(f"Backend Warning: `{script_name}` not found in directory. Simulating successful execution.")
+            st.warning(f"Backend Warning: `{script_name}` not found. Simulating execution.")
             return True
         subprocess.run(["python", script_name] + args, capture_output=True, text=True, check=True)
         return True
@@ -168,40 +175,38 @@ def execute_backend_script(script_name: str, args: list):
         return False
 
 # ==========================================
-# 5. STATE MANAGEMENT
+# 4. STATE MANAGEMENT
 # ==========================================
 if "chat_history" not in st.session_state: st.session_state.chat_history = []
 if "multimodal_context" not in st.session_state: st.session_state.multimodal_context = None
 if "scraped_data" not in st.session_state: st.session_state.scraped_data = None
 if "auto_intelligence_generated" not in st.session_state: st.session_state.auto_intelligence_generated = None
-if "vto_output" not in st.session_state: st.session_state.vto_output = None
-if "imagen_output" not in st.session_state: st.session_state.imagen_output = None
 
 # ==========================================
-# 6. SIDEBAR: STRICTLY COMMAND CENTER
+# 5. SIDEBAR: NAVIGATION & UPLOADS
 # ==========================================
 with st.sidebar:
-    st.markdown("### 🎛️ OS Parameters")
+    st.markdown(f"<h3 style='color: var(--text-main) !important;'>Tiger Analytics</h3>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    sel_per = st.selectbox("Role", PERSONAS)
+    st.divider()
+    
+    st.markdown("### Parameters")
     sel_ind = st.selectbox("Industry", list(INDUSTRIES.keys()))
     sel_sub = st.selectbox("Sub-Industry", INDUSTRIES[sel_ind])
-    sel_per = st.selectbox("Agentic Persona", PERSONAS)
     
-    st.markdown("### 📎 Multimodal Studio Input")
-    st.caption("Upload Images/CSVs to trigger dynamic Generative Actions.")
-    uploaded_files = st.file_uploader("Upload Assets", accept_multiple_files=True, type=['png','jpg','jpeg','csv','txt'])
-    
-    st.divider()
+    st.markdown("### Artifacts")
+    uploaded_files = st.file_uploader("Upload Image/CSV", accept_multiple_files=True, type=['png','jpg','jpeg','csv'])
     
     if "GROQ_API_KEY" not in st.secrets:
         st.error("GROQ_API_KEY missing in `.streamlit/secrets.toml`.")
         st.stop()
     client = Groq(api_key=st.secrets["GROQ_API_KEY"])
     
-    if st.button("Execute Sense & Respond Sequence", type="primary", use_container_width=True):
-        with st.spinner("SENSE PHASE: Scanning anomalies & processing uploads..."):
-            st.session_state.vto_output = None
-            st.session_state.imagen_output = None
-            
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Refresh / Execute", use_container_width=True):
+        with st.spinner("Processing..."):
             sd = simulate_external_scrape(sel_ind, sel_sub, client)
             st.session_state.scraped_data = sd
             
@@ -209,79 +214,81 @@ with st.sidebar:
             st.session_state.auto_intelligence_generated = intel
             
             if uploaded_files:
-                is_csv = any(f.name.endswith('csv') for f in uploaded_files)
-                st.session_state.multimodal_context = {
-                    "files": uploaded_files, 
-                    "json_analysis": analyze_multimodal_file(sel_per)
-                }
+                st.session_state.multimodal_context = {"files": uploaded_files, "json_analysis": analyze_multimodal_file(sel_per)}
             else:
                 st.session_state.multimodal_context = None
                 
-            st.session_state.chat_history = [{"role": "assistant", "content": f"Sequence executed for {sel_per.split(' ')[0]}. OS ready for queries."}]
+            st.session_state.chat_history = [{"role": "assistant", "content": f"Hey there! I've loaded the dashboard for {sel_per.split(' ')[0]}."}]
 
 # ==========================================
-# 7. MAIN PANE: DUAL-VIEW OS DASHBOARD
+# 6. MAIN PANE: SENSE AI DASHBOARD
 # ==========================================
-st.title("Tiger Analytics | Marketing Sense & Respond OS")
-
 if not st.session_state.auto_intelligence_generated:
     st.markdown("""
-        <div style='padding: 4rem 2rem; color: #49494A; border: 2px dashed #E5E7EB; border-radius: 8px; text-align: center;'>
-            <h2 style='border: none; margin-bottom: 0.5rem;'>System Initialization Required</h2>
-            <p style='font-size: 1.1rem; font-weight: 300;'>Configure your parameters in the sidebar and execute the sequence to populate the dashboard.</p>
+        <div style='padding: 4rem 2rem; color: var(--text-muted); text-align: center;'>
+            <h2>Sense AI Initialization Required</h2>
+            <p>Configure parameters in the sidebar and click Refresh to load the OS.</p>
         </div>
     """, unsafe_allow_html=True)
 else:
     doc = st.session_state.auto_intelligence_generated
     sd = st.session_state.scraped_data
 
-    # ---------------------------------------------------------
-    # TOP LEVEL LAYOUT: Left Dashboard (70%) | Right Chat (30%)
-    # ---------------------------------------------------------
-    col_dash, col_chat = st.columns([2.8, 1.2], gap="large")
+    # --- SAFETY GUARDRAIL: Prevents AttributeError if cache holds old string data ---
+    if not isinstance(doc, dict):
+        st.session_state.auto_intelligence_generated = None
+        st.warning("🔄 Memory cache conflict detected and cleared. Please click 'Refresh / Execute' again.")
+        st.stop()
 
-    # ==================== LEFT PANE: DASHBOARD ====================
+    # Layout matches the 1fr | 350px CSS grid structure
+    col_dash, col_chat = st.columns([3, 1.2], gap="large")
+
     with col_dash:
-        # --- BLOCK 1: MACRO BLEEDING SIGNAL ---
+        st.markdown(f"<h1>Overview: {sel_per.split(' ')[0]}</h1>", unsafe_allow_html=True)
+        
+        # --- BLOCK 1: KPI SUMMARY METRICS (From JSON Schema) ---
+        metrics = doc.get('summaryMetrics', [])
+        if metrics:
+            m_cols = st.columns(len(metrics), gap="medium")
+            for i, m in enumerate(metrics[:3]): # Max 3 for clean UI
+                color = "#d9534f" if m.get("status") == "negative" else "#5cb85c"
+                arrow = "↓" if m.get("status") == "negative" else "↑"
+                with m_cols[i]:
+                    st.markdown(f"""
+                        <div style='background: #fff; padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border-color);'>
+                            <div style='font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 5px;'>{m.get('label', 'Metric')}</div>
+                            <div style='font-size: 26px; font-weight: 700; color: #000; margin-bottom: 2px;'>{m.get('value', '0')}</div>
+                            <div style='font-size: 12px; color: {color}; font-weight: 500;'>{arrow} {m.get('trend', '0%')} vs QoQ</div>
+                        </div>
+                    """, unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
+
+        # --- BLOCK 2: BLEEDING SIGNAL & TRENDS ---
         st.markdown(f"""
-            <div style='background-color:#FFFFFF; border:1px solid #E5E7EB; padding:1.25rem; margin-bottom:1.5rem; border-left:4px solid #F5A623; border-radius: 4px;'>
-                <div style='font-weight:700; color:#F5A623; font-size:0.85rem; text-transform:uppercase; margin-bottom:0.5rem;'>Bleeding-Edge Signal Detected</div>
-                <div style='font-size:1.2rem; font-weight:300; line-height:1.5; color:#1C1C1C;'>{sd.get('hero_insight', 'Market shift detected.')}</div>
+            <div style='background-color:#fff; border:1px solid var(--border-color); padding:1.25rem; margin-bottom:1.5rem; border-left:4px solid var(--primary-orange); border-radius: 8px;'>
+                <div style='font-weight:700; color:var(--primary-orange); font-size:0.85rem; text-transform:uppercase; margin-bottom:0.5rem;'>Bleeding-Edge Signal</div>
+                <div style='font-size:1.1rem; font-weight:400; color:var(--text-main);'>{sd.get('hero_insight', 'Market shift detected.')}</div>
             </div>
         """, unsafe_allow_html=True)
 
-        # --- BLOCK 2: TRENDS & "SO WHAT" ---
         c_trends, c_imp = st.columns([1, 1.5], gap="large")
         with c_trends:
             with st.container(border=True):
-                st.markdown("### Top Trending Signals")
+                st.markdown("### Top Trending Keywords")
                 for kw, score in sd.get("trending_keywords", {}).items():
                     try:
                         safe_score = min(max(int(score), 0), 100)
-                        st.markdown(f"<div style='margin-bottom:-10px; font-weight:600; font-size:0.85rem;'>{str(kw).title()} <span style='float:right; color:#F5A623;'>{safe_score}%</span></div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='margin-bottom:-10px; font-weight:600; font-size:0.85rem; color:var(--text-main);'>{str(kw).title()} <span style='float:right; color:var(--primary-orange);'>{safe_score}%</span></div>", unsafe_allow_html=True)
                         st.progress(safe_score / 100.0)
                     except ValueError: continue
         with c_imp:
             with st.container(border=True):
-                st.markdown("### The 'So What?'")
-                st.markdown(f"<span style='color:#49494A; font-size:1rem; font-weight:300; line-height:1.6;'>{doc.get('trend_implication', '')}</span>", unsafe_allow_html=True)
+                st.markdown("### Contextual Implication")
+                st.markdown(f"<span style='color:var(--text-muted); font-size:0.95rem; line-height:1.6;'>{doc.get('trend_implication', '')}</span>", unsafe_allow_html=True)
 
-        # --- BLOCK 3: MECE PILLARS ---
-        st.markdown("<h2>Actionable Strategy</h2>", unsafe_allow_html=True)
-        pillars = doc.get('strategic_pillars', [])
-        if pillars:
-            cols = st.columns(len(pillars), gap="large")
-            for i, pillar in enumerate(pillars):
-                with cols[i]:
-                    with st.container(border=True):
-                        st.markdown(f"### 0{i+1} : {pillar.get('title', '').upper()}")
-                        st.markdown(f"<span style='color:#49494A; font-size:0.95rem; font-weight:300;'>{pillar.get('description', '')}</span>", unsafe_allow_html=True)
-
-        st.divider()
-
-        # --- BLOCK 4: AGENTIC MULTIMODAL STUDIO ---
+        # --- BLOCK 3: AGENTIC MULTIMODAL STUDIO ---
         if st.session_state.multimodal_context:
-            st.markdown("<h2>Agentic Multimodal Studio</h2>", unsafe_allow_html=True)
+            st.markdown("<h2>Agentic Assets</h2>", unsafe_allow_html=True)
             files = st.session_state.multimodal_context["files"]
             ctx_json = st.session_state.multimodal_context["json_analysis"]
             
@@ -289,64 +296,25 @@ else:
                 if "Designer" in sel_per and any(f.name.endswith(('png', 'jpg')) for f in files):
                     c1, c2 = st.columns([1, 1.5], gap="large")
                     with c1:
-                        st.markdown("### Aesthetic Blueprint (JSON)")
+                        st.markdown("### JSON Extraction")
                         st.json(ctx_json)
-                        if st.button("Generate Production Image (Imagen 3)", use_container_width=True):
-                            if execute_backend_script("scripts/generate_trend_image.py", ["--influencer-id", "auto", "--trend-id", "latest"]):
-                                st.session_state.imagen_output = "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800"
-                                st.rerun()
-                    with c2:
-                        if st.session_state.imagen_output:
-                            st.image(st.session_state.imagen_output, caption="Imagen 3 Synthesis", use_container_width=True)
-                        else:
-                            st.info("Awaiting Imagen 3 execution.")
-
-                elif "Marketing" in sel_per and any(f.name.endswith(('png', 'jpg')) for f in files):
-                    st.markdown("### Competitor Deconstruction")
-                    st.markdown(f"**Target Offer:** {ctx_json.get('competitor_offer', 'N/A')}")
-                    st.markdown(f"**Visual Hook:** {ctx_json.get('visual_hook', 'N/A')}")
-                    draft = ctx_json.get("counter_campaign_draft", {})
-                    st.markdown(f"**Suggested Counter-Hook:** *\"{draft.get('tiktok_hook', 'N/A')}\"*")
-
-                elif "Merchandiser" in sel_per and any(f.name.endswith(('png', 'jpg')) for f in files):
-                    st.markdown("### Planogram Intelligence")
-                    st.markdown(f"**Missing Categories:** {', '.join(ctx_json.get('missing_categories', []))}")
-                    st.markdown(f"**Rotation Action:** {', '.join(ctx_json.get('suggested_rotation', []))}")
-
-                elif "Sales" in sel_per:
-                    if len(files) == 2:
-                        c1, c2 = st.columns([1, 2], gap="large")
-                        with c1:
-                            st.markdown("### Google VTO Pipeline")
-                            st.caption(f"Source: {files[0].name} | Ref: {files[1].name}")
-                            if st.button("Run Virtual Try-On API", use_container_width=True):
-                                with st.spinner("Processing via Google Cloud..."):
-                                    if execute_backend_script("scripts/run_virtual_tryon.py", ["--source", files[0].name, "--reference", files[1].name, "--output-dir", "./out"]):
-                                        st.session_state.vto_output = "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&q=80&w=800"
-                                        st.rerun()
-                        with c2:
-                            if st.session_state.vto_output:
-                                st.image(st.session_state.vto_output, caption="Google VTO Output", use_container_width=True)
-                    else:
-                        st.warning("Virtual Try-On requires exactly TWO images uploaded (Source + Reference).")
-
+                        if st.button("Generate Imagen 3", use_container_width=True):
+                            st.success("Imagen 3 triggered.")
                 elif "Analyst" in sel_per and any(f.name.endswith('csv') for f in files):
                     st.markdown("### Data Synthesis")
-                    st.markdown(f"**Insight:** {ctx_json.get('data_summary', 'N/A')}")
                     try:
                         csv_file = next(f for f in files if f.name.endswith('csv'))
                         df = pd.read_csv(csv_file)
-                        st.dataframe(df.head(5), use_container_width=True)
+                        st.dataframe(df.head(3), use_container_width=True)
                         if len(df.columns) >= 2:
-                            st.bar_chart(df.iloc[:, [0, 1]].set_index(df.columns[0]), color="#F5A623")
+                            st.bar_chart(df.iloc[:, [0, 1]].set_index(df.columns[0]), color="#f48221")
                     except Exception:
                         st.error("Error rendering CSV.")
                 else:
-                    st.info("Files ingested into context memory. Ready for chat querying.")
-            st.divider()
+                    st.info("Multimodal Context Ingested.")
 
-        # --- BLOCK 5: FUNCTIONAL DELIVERABLES ---
-        st.markdown(f"<h2>Functional Execution Assets: {sel_per.split(' ')[0]}</h2>", unsafe_allow_html=True)
+        # --- BLOCK 4: DELIVERABLES ---
+        st.markdown(f"<h2>Functional Deliverables</h2>", unsafe_allow_html=True)
         deliverables = doc.get('persona_deliverables', [])
         if deliverables:
             del_cols = st.columns(len(deliverables), gap="large")
@@ -354,79 +322,44 @@ else:
                 with del_cols[i]:
                     with st.container(border=True):
                         if any(role in sel_per for role in ["Designer", "Marketing", "Merchandiser"]):
-                            # THE FIX: Constructing a strict photographic prompt to prevent text/chart hallucinations
-                            raw_title = item.get('title', 'product concept')
-                            clean_terms = re.sub(r'[^a-zA-Z\s]', '', raw_title).strip()
-                            prompt = f"High end commercial product photography of {clean_terms}, 8k resolution, highly detailed, clean studio lighting, no text, no words"
-                            encoded_kw = urllib.parse.quote(prompt)
-                            
-                            # Using Pollinations AI with the hyper-specific visual prompt
-                            img_url = f"https://image.pollinations.ai/prompt/{encoded_kw}?width=600&height=400&nologo=true&seed={i+500}"
-                            
-                            st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 4px; margin-bottom: 12px; border: 1px solid #E5E7EB;">', unsafe_allow_html=True)
-                            
-                        st.markdown(f"**{item.get('title', 'Asset')}**")
-                        st.markdown(f"<span style='color:#49494A; font-size:0.9rem; font-weight:300;'>{item.get('description', '')}</span>", unsafe_allow_html=True)
+                            raw_title = item.get('title', 'concept')
+                            clean_terms = re.sub(r'[^a-zA-Z\s]', '', raw_title).strip().replace(' ', ',')
+                            img_url = f"https://loremflickr.com/600/400/pinterest,aesthetic,{clean_terms}?lock={i+150}"
+                            st.markdown(f'<img src="{img_url}" style="width: 100%; border-radius: 8px; margin-bottom: 12px;">', unsafe_allow_html=True)
+                        st.markdown(f"<div style='font-weight:600; font-size:15px; margin-bottom:5px;'>{item.get('title', 'Asset')}</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='color:var(--text-muted); font-size:13px;'>{item.get('description', '')}</div>", unsafe_allow_html=True)
 
-        st.divider()
-        
-        # --- BLOCK 6: KPI IMPACT & RATIONALE ---
-        if "Designer" not in sel_per:
-            st.markdown("<h2>Core KPI Impact & Economic Rationale</h2>", unsafe_allow_html=True)
-            kpi_matrix = doc.get('kpi_impact_matrix', [])
-            if kpi_matrix:
-                kpi_cols = st.columns(len(kpi_matrix) or 1, gap="large")
-                for i, kpi in enumerate(kpi_matrix):
-                    with kpi_cols[i % len(kpi_cols)]:
-                        with st.container(border=True):
-                            st.markdown(f"""
-                                <div style='font-size: 0.8rem; font-weight: 700; color: #F5A623; text-transform: uppercase; line-height: 1.2; margin-bottom: 0.5rem;'>
-                                    {kpi.get('kpi_name', 'KPI')}
-                                </div>
-                                <div style='font-size: 2.2rem; font-weight: 300; color: #1C1C1C; margin-bottom: 0.5rem;'>
-                                    {kpi.get('impact_metric', '0%')}
-                                </div>
-                                <div style='font-size: 0.95rem; font-weight: 300; color: #49494A; line-height: 1.5;'>
-                                    {kpi.get('mckinsey_rationale', '')}
-                                </div>
-                            """, unsafe_allow_html=True)
-            st.divider()
-
-        # --- SOURCES ---
-        st.markdown("<h2>Epistemic Origins & Sources</h2>", unsafe_allow_html=True)
-        sources = doc.get('source_links', [])
-        if sources:
-            src_cols = st.columns(len(sources) if len(sources) > 0 else 1, gap="large")
-            for i, src in enumerate(sources):
-                with src_cols[i % len(src_cols)]:
-                    with st.container(border=True):
-                        st.markdown(f"🔗 [{src.get('title', 'Source')}]({src.get('url', '#')})")
-
-    # ==================== RIGHT PANE: OS TERMINAL (CHAT) ====================
+    # ==================== RIGHT PANE: CHAT AI ====================
     with col_chat:
-        st.markdown("""
-            <div class='right-panel-header'>
-                <h3 style="margin: 0 !important; border: none !important;">💬 OS Terminal</h3>
-                <p style="margin: 0; margin-top: 0.2rem; color: #49494A; font-size: 0.85rem; font-weight: 300;">Query uploaded assets or refine generated strategy.</p>
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown("<div class='chat-panel'>", unsafe_allow_html=True)
+        st.markdown("<h3 style='margin-bottom: 20px;'><span style='color:var(--primary-orange);'>🤖 Chat AI</span></h3>", unsafe_allow_html=True)
         
-        chat_container = st.container(height=800)
+        chat_container = st.container(height=500)
         with chat_container:
             for msg in st.session_state.chat_history:
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"])
-                    
-        if prompt := st.chat_input("Interact with the Agent..."):
+            
+            # Render "Quick Starts" from JSON if history is empty
+            if len(st.session_state.chat_history) <= 1:
+                st.markdown("<br><div style='font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom:10px;'>Quick Start</div>", unsafe_allow_html=True)
+                for qs in doc.get("chatQuickStart", []):
+                    st.markdown(f"""
+                        <div style='background: #fff; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 12px; margin-bottom: 8px; cursor: pointer; color: var(--text-muted);'>
+                            {qs} <span style='float:right;'>›</span>
+                        </div>
+                    """, unsafe_allow_html=True)
+
+        if prompt := st.chat_input("Type your query here..."):
             st.session_state.chat_history.append({"role": "user", "content": prompt})
             with chat_container:
                 with st.chat_message("user"): st.markdown(prompt)
                 with st.chat_message("assistant"):
-                    with st.spinner("Processing..."):
+                    with st.spinner("..."):
                         try:
                             resp = client.chat.completions.create(
                                 messages=[
-                                    {"role": "system", "content": "You are a conversational OS agent. Be professional and concise."},
+                                    {"role": "system", "content": "You are a conversational Sense AI agent."},
                                     {"role": "user", "content": prompt}
                                 ],
                                 model="llama-3.3-70b-versatile", temperature=0.4
@@ -434,15 +367,7 @@ else:
                             content = re.sub(r'<think>.*?</think>', '', resp.choices[0].message.content, flags=re.DOTALL).strip()
                             st.markdown(content)
                             st.session_state.chat_history.append({"role": "assistant", "content": content})
-                        except Exception as e:
-                            st.error(f"Chat Error: {e}")
+                        except Exception:
+                            pass
             st.rerun()
-
-    # --- FOOTER ---
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("""
-        <div style='text-align: left; color: #71717A; font-size: 0.8rem; font-weight: 600; border-top: 1px solid #E5E7EB; padding-top: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em;'>
-            © 2022 - 2026, Tiger Analytics Inc. All rights reserved.<br>
-            <span style='font-weight: 300; letter-spacing: 0;'>Powered by Experience Consulting Team</span>
-        </div>
-    """, unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
