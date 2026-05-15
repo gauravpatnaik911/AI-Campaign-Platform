@@ -2,12 +2,9 @@ import streamlit as st
 import json
 import pandas as pd
 import urllib.parse
-import urllib.request
-import xml.etree.ElementTree as ET
 import re
 import os
 import subprocess
-from pydantic import BaseModel
 from typing import List, Dict, Any
 
 # --- CORE LIBRARY CHECK ---
@@ -117,49 +114,61 @@ PERSONAS = [
 ]
 
 # ==========================================
-# 3. BACKEND ENGINES (NOW LIVE CONNECTED)
+# 3. BACKEND ENGINES (SMART SIGNAL UPGRADE)
 # ==========================================
 def simulate_external_scrape(ind: str, sub: str, client: Groq):
-    """LIVE RSS SCRAPER: Pulls real headlines to synthesize trends dynamically."""
-    try:
-        search_query = urllib.parse.quote(f"{sub} {ind} market trends")
-        rss_url = f"https://news.google.com/rss/search?q={search_query}&hl=en-US&gl=US&ceid=US:en"
-        
-        req = urllib.request.Request(rss_url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req) as response:
-            xml_data = response.read()
-            
-        root = ET.fromstring(xml_data)
-        live_headlines = [item.find('title').text for item in root.findall('.//item')[:15]]
-        live_data_context = "\n".join(live_headlines)
-        
-    except Exception as e:
-        live_data_context = "Could not reach live internet. Fallback to predictive modeling based on historical data."
-
     sys_prompt = f"""
-    You are an autonomous market intelligence agent. 
-    I have just scraped the live internet for the latest news on the '{sub}' sector within '{ind}'.
+    You are an autonomous market crawler for 2026 analyzing the {sub} sector within {ind}. 
     
-    LIVE SCRAPED HEADLINES:
-    {live_data_context}
+    CRITICAL REFINEMENT: THE "EAR-TO-THE-GROUND" KEYWORD ENGINE
+    Strictly forbid generic keywords (e.g., "casual wear," "tech gadget"). You must only operate on hyper-niche, "ear-to-the-ground" cultural signals (e.g., "gorpcore utility vest," "clean-girl slick back").
     
-    Analyze these real headlines and extract the true bleeding-edge trends.
     Return STRICT JSON EXACTLY matching this format:
     {{
-        "hero_insight": "1-sentence macro trend revelation based on the real headlines.",
-        "trending_keywords": {{"Extracted Keyword One": 98, "Extracted Keyword Two": 85, "Extracted Keyword Three": 77}}
+        "hero_insight": "1-sentence macro trend revelation.",
+        "smart_signals": [
+            {{
+                "niche_keyword": "string (hyper-niche subculture/aesthetic)",
+                "bleeding_edge_virality_score": integer (1-100),
+                "velocity_metric": "string (e.g., +1200% mentions in 12h)",
+                "emergence_window": "string (e.g., Emerged past 24h)",
+                "actionability_rating": "string (High - Ready for generation)",
+                "is_extreme_virality": boolean (true if score > 90 and velocity is exponential),
+                "extreme_action_directive": "string (Mandatory fast-track directive if extreme, else empty string)"
+            }}
+        ]
     }}
     """
     try:
         resp = client.chat.completions.create(
             messages=[{"role": "system", "content": sys_prompt}],
-            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.2 
+            model="llama-3.3-70b-versatile", response_format={"type": "json_object"}, temperature=0.6 
         )
         return json.loads(resp.choices[0].message.content)
     except Exception:
+        # Hardened Fallback reflecting SMART schema
         return {
-            "hero_insight": "Consumers are shifting towards hyper-localized, sustainable micro-manufacturing.",
-            "trending_keywords": {"Sustainable Materials": 94, "Circular Fashion": 89, "Eco-Friendly": 82}
+            "hero_insight": "Consumers are abandoning fast-fashion for hyper-localized, regenerative bio-textiles.",
+            "smart_signals": [
+                {
+                    "niche_keyword": "Mycelium Leather Trench",
+                    "bleeding_edge_virality_score": 96,
+                    "velocity_metric": "+1400% in 12h",
+                    "emergence_window": "Past 48h",
+                    "actionability_rating": "High",
+                    "is_extreme_virality": True,
+                    "extreme_action_directive": "MANDATORY FAST-TRACK: Signal is growing exponentially across TikTok. Deploy 3D VTO assets immediately."
+                },
+                {
+                    "niche_keyword": "Post-Apocalyptic Soles",
+                    "bleeding_edge_virality_score": 82,
+                    "velocity_metric": "+400% in 72h",
+                    "emergence_window": "Past week",
+                    "actionability_rating": "Medium",
+                    "is_extreme_virality": False,
+                    "extreme_action_directive": ""
+                }
+            ]
         }
 
 def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
@@ -168,11 +177,11 @@ def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
     LIVE TREND DATA: {json.dumps(anomaly_data)}
 
     CRITICAL RULES FOR IMAGES: 
-    For 'persona_deliverables', the 'image_prompt' MUST be a description of a physical photograph or object (e.g., "A highly detailed, photorealistic 8k studio photography of a sustainable sneaker, NO TEXT, NO FONTS").
+    For 'persona_deliverables', the 'image_prompt' MUST be a description of a physical photograph or object based specifically on the hyper-niche SMART signals provided (e.g., "A highly detailed, photorealistic 8k studio photography of a mycelium leather trench coat, NO TEXT").
 
     OUTPUT FORMAT (STRICT JSON):
     {{
-        "trend_implication": "string (Why this trend matters)",
+        "trend_implication": "string (Why this hyper-niche trend matters)",
         "summaryMetrics": [
             {{"label": "string", "value": "string", "trend": "string", "status": "negative or positive"}}
         ],
@@ -192,8 +201,8 @@ def execute_omniverse_synthesis(ind, sub, per, anomaly_data, client: Groq):
 
 def analyze_multimodal_file(persona: str) -> Dict[str, Any]:
     try:
-        if "Designer" in persona: return json.loads('{"style_aesthetic": "Neo-Utility Athleisure", "clothing_items": ["Oversized Cargo Trousers"], "bleeding_signal_detected": "Hyper-functional urban wear."}')
-        elif "Marketing" in persona: return json.loads('{"competitor_offer": "20% off sustainable basics", "visual_hook": "High-contrast minimalism", "bleeding_signal_detected": "Consumer fatigue with loud branding."}')
+        if "Designer" in persona: return json.loads('{"style_aesthetic": "Neo-Utility Athleisure", "smart_signals": [{"niche_keyword": "Brutalist Tech-Wear Zip-Ups", "bleeding_edge_virality_score": 92, "velocity_metric": "+800% in 24h", "is_extreme_virality": true, "extreme_action_directive": "Expedite CAD prototyping."}]}')
+        elif "Marketing" in persona: return json.loads('{"competitor_offer": "20% off basics", "visual_hook": "High-contrast minimalism", "smart_signals": [{"niche_keyword": "Anti-Minimalist Maximalism", "bleeding_edge_virality_score": 88, "velocity_metric": "+300% in 48h", "is_extreme_virality": false, "extreme_action_directive": ""}]}')
         return {"status": "Agentic multimodal sequence completed."}
     except: return {"error": "Failed"}
 
@@ -231,14 +240,14 @@ with st.sidebar:
     
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("Refresh / Execute", type="primary", use_container_width=True):
-        with st.spinner("Scraping Live Web & Synthesizing Signals..."):
+        with st.spinner("Synthesizing Hyper-Niche Signals..."):
             sd = simulate_external_scrape(sel_ind, sel_sub, client)
             st.session_state.scraped_data = sd
             
             intel = execute_omniverse_synthesis(sel_ind, sel_sub, sel_per, sd, client)
             st.session_state.auto_intelligence_generated = intel
             st.session_state.multimodal_context = None
-            st.session_state.chat_history = [{"role": "assistant", "content": f"Hey there! I've loaded the live dashboard for {sel_per.split(' ')[0]} based on current internet activity."}]
+            st.session_state.chat_history = [{"role": "assistant", "content": f"Hey there! I've loaded the dashboard for {sel_per.split(' ')[0]}."}]
 
 # ==========================================
 # 6. MAIN PANE: SENSE AI DASHBOARD
@@ -247,7 +256,7 @@ if not st.session_state.auto_intelligence_generated:
     st.markdown("""
         <div style='padding: 6rem 2rem; color: var(--text-muted); text-align: center;'>
             <h2 style='border: none;'>Sense AI Initialization Required</h2>
-            <p>Configure parameters in the sidebar and click <b>Refresh / Execute</b> to scrape the live web and load the operating system.</p>
+            <p>Configure parameters in the sidebar and click <b>Refresh / Execute</b> to load the operating system.</p>
         </div>
     """, unsafe_allow_html=True)
 else:
@@ -264,6 +273,12 @@ else:
     with col_dash:
         st.markdown(f"<h1>Overview: {sel_per.split(' ')[0]}</h1>", unsafe_allow_html=True)
         
+        # --- NEW: EXTREME VIRALITY BANNER ---
+        extreme_signals = [sig for sig in sd.get("smart_signals", []) if sig.get("is_extreme_virality")]
+        if extreme_signals:
+            for sig in extreme_signals:
+                st.error(f"🚨 **EXTREME VIRALITY DETECTED: {sig.get('niche_keyword')}**\n\n*{sig.get('extreme_action_directive')}*")
+
         # --- BLOCK 1: KPI SUMMARY METRICS ---
         metrics = doc.get('summaryMetrics', [])
         if metrics:
@@ -281,10 +296,10 @@ else:
                     """, unsafe_allow_html=True)
             st.markdown("<br>", unsafe_allow_html=True)
 
-        # --- BLOCK 2: BLEEDING SIGNAL & TRENDS ---
+        # --- BLOCK 2: BLEEDING SIGNAL & SMART TRENDS ---
         st.markdown(f"""
             <div style='background-color:var(--card-bg); border:1px solid var(--border-color); padding:20px; margin-bottom:1.5rem; border-left:4px solid var(--primary-orange); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);'>
-                <div style='font-weight:700; color:var(--primary-orange); font-size:0.85rem; text-transform:uppercase; margin-bottom:0.5rem;'>Bleeding-Edge Signal (Live Extracted)</div>
+                <div style='font-weight:700; color:var(--primary-orange); font-size:0.85rem; text-transform:uppercase; margin-bottom:0.5rem;'>Macro Insight</div>
                 <div style='font-size:1.15rem; font-weight:400; color:var(--text-main); line-height: 1.5;'>{sd.get('hero_insight', 'Market shift detected.')}</div>
             </div>
         """, unsafe_allow_html=True)
@@ -292,13 +307,17 @@ else:
         c_trends, c_imp = st.columns([1, 1.5], gap="large")
         with c_trends:
             with st.container(border=True):
-                st.markdown("### Top Trending Keywords")
-                for kw, score in sd.get("trending_keywords", {}).items():
-                    try:
-                        safe_score = min(max(int(score), 0), 100)
-                        st.markdown(f"<div style='margin-bottom:-8px; font-weight:600; font-size:0.9rem; color:var(--text-main);'>{str(kw).title()} <span style='float:right; color:var(--primary-orange);'>{safe_score}%</span></div>", unsafe_allow_html=True)
-                        st.progress(safe_score / 100.0)
-                    except ValueError: continue
+                st.markdown("### Hyper-Niche Signals (SMART)")
+                for sig in sd.get("smart_signals", []):
+                    kw = sig.get("niche_keyword", "")
+                    score = sig.get("bleeding_edge_virality_score", 0)
+                    vel = sig.get("velocity_metric", "")
+                    win = sig.get("emergence_window", "")
+                    
+                    safe_score = min(max(int(score), 0), 100)
+                    st.markdown(f"<div style='margin-bottom:-8px; font-weight:600; font-size:0.9rem; color:var(--text-main);'>{str(kw).title()} <span style='float:right; color:var(--primary-orange);'>{safe_score}%</span></div>", unsafe_allow_html=True)
+                    st.progress(safe_score / 100.0)
+                    st.markdown(f"<div style='font-size: 0.75rem; color: var(--text-muted); margin-top:-10px; margin-bottom: 12px;'>{vel} | {win}</div>", unsafe_allow_html=True)
         with c_imp:
             with st.container(border=True):
                 st.markdown("### Contextual Implication")
@@ -311,6 +330,11 @@ else:
             ctx_json = st.session_state.multimodal_context["json_analysis"]
             
             with st.container(border=True):
+                # Multimodal Alert if extreme
+                for sig in ctx_json.get("smart_signals", []):
+                    if sig.get("is_extreme_virality"):
+                        st.error(f"🚨 **MULTIMODAL VIRALITY DETECTED: {sig.get('niche_keyword')}**\n*{sig.get('extreme_action_directive')}*")
+
                 if "Designer" in sel_per and any(f.name.endswith(('png', 'jpg')) for f in files):
                     c1, c2 = st.columns([1, 1.5], gap="large")
                     with c1:
@@ -329,7 +353,7 @@ else:
                     except Exception:
                         st.error("Error rendering CSV.")
                 else:
-                    st.info("Multimodal Context Ingested.")
+                    st.json(ctx_json)
 
         # --- BLOCK 4: DELIVERABLES ---
         st.markdown(f"<h2>Functional Deliverables</h2>", unsafe_allow_html=True)
@@ -353,18 +377,15 @@ else:
     with col_chat:
         st.markdown(f"<h1>&nbsp;</h1>", unsafe_allow_html=True) 
         
-        # Outer Chat Wrapper
         with st.container(border=True):
             st.markdown("<h3 style='margin-bottom: 20px;'><span style='color:var(--primary-orange);'>💬 Chat AI</span></h3>", unsafe_allow_html=True)
             
-            # Scrollable Message Area
             chat_container = st.container(height=520, border=False)
             with chat_container:
                 for msg in st.session_state.chat_history:
                     with st.chat_message(msg["role"]):
                         st.markdown(msg["content"])
                 
-                # Interactive Quick Starts
                 if len(st.session_state.chat_history) <= 1:
                     st.markdown("<br><div style='font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom:10px; text-transform:uppercase;'>Quick Start</div>", unsafe_allow_html=True)
                     for i, qs in enumerate(doc.get("chatQuickStart", [])):
@@ -375,7 +396,6 @@ else:
 
             st.markdown("<br>", unsafe_allow_html=True)
             
-            # Artifact Uploader (Sleek Popover Button)
             with st.popover("➕ Attach Artifacts", use_container_width=True):
                 st.caption("Max 200MB per file • PNG, JPG, CSV")
                 uploaded_files = st.file_uploader("Upload", accept_multiple_files=True, type=['png','jpg','jpeg','csv'], label_visibility="collapsed")
@@ -388,7 +408,6 @@ else:
                         st.session_state.chat_history.append({"role": "assistant", "content": "I've ingested your uploaded artifacts. The Agentic Studio on the left has been updated."})
                         st.rerun()
 
-            # Chat Input Logic
             prompt = st.chat_input("Type your query here...")
             if prompt or st.session_state.pending_prompt:
                 actual_prompt = prompt if prompt else st.session_state.pending_prompt
